@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Camomile client polymer</title>
+        <script />
+    </head>
+
+    <body>
+        <camomile id="camomile1" url="camomile.fr" />
+        <div>
+            <login src="camomile1" id="user1" />
+        </div>
+        <div>
+            <corpus-select src="user1" id="corpus1" />
+            <medium-select src="corpus1" id="medium1" />
+            <player src="medium1" />
+            <segmentation />
+        </div>
+    </body>
+</html>
