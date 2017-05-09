@@ -1,19 +1,20 @@
+<script src="/node_modules/camomile-client/camomile.js"></script>
+
 <link rel="import"  href="/bower_components/polymer/polymer-element.html">
 
-<dom-module id="corpus-select">
+<dom-module id="x-login">
 
     <template>
         <form action="#">
-            <select name="corpus">
-                <option>corpus 1</option>
-            </select>
-            <input type="submit" value="select" />
+            <label id="User"><input type="text" name="user"/></label>
+            <label id="Password"><input type="password" name="password"/></label>
+            <input type="submit" value="login" />
         </form>
     </template>
 
     <script>
-        class CorpusSelect extends Polymer.Element {
-            static get is() { return "corpus-select"; }
+        class XLogin extends Polymer.Element {
+            static get is() { return "x-login"; }
             constructor() {
                 super();
             }
@@ -22,7 +23,8 @@
                 super.ready();
                 console.log("id: "+this.id);
                 console.log("src: "+this.src);
-
+                this.camomile=new Camomile();
+                //this.camomile.login()
             }
             static get properties() {
                 return {
@@ -35,7 +37,7 @@
                 };
             }
         }
-        customElements.define(CorpusSelect.is, CorpusSelect);
+        customElements.define(XLogin.is, XLogin);
     </script>
 
 </dom-module>

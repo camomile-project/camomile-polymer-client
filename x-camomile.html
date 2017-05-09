@@ -1,19 +1,13 @@
 <link rel="import"  href="/bower_components/polymer/polymer-element.html">
 
-<dom-module id="corpus-select">
+<dom-module id="x-camomile">
 
     <template>
-        <form action="#">
-            <select name="corpus">
-                <option>corpus 1</option>
-            </select>
-            <input type="submit" value="select" />
-        </form>
     </template>
 
     <script>
-        class CorpusSelect extends Polymer.Element {
-            static get is() { return "corpus-select"; }
+        class XCamomile extends Polymer.Element {
+            static get is() { return "x-camomile"; }
             constructor() {
                 super();
             }
@@ -21,12 +15,12 @@
             ready() {
                 super.ready();
                 console.log("id: "+this.id);
-                console.log("src: "+this.src);
+                console.log("url: "+this.url);
 
             }
             static get properties() {
                 return {
-                    src: {
+                    url: {
                         type: String
                     },
                     id: {
@@ -35,7 +29,7 @@
                 };
             }
         }
-        customElements.define(CorpusSelect.is, CorpusSelect);
+        customElements.define(XCamomile.is, XCamomile);
     </script>
 
 </dom-module>
