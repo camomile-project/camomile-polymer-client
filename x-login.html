@@ -23,7 +23,12 @@
                 super.ready();
                 console.log("id: "+this.id);
                 console.log("src: "+this.src);
-                this.camomile=new Camomile();
+                const self=this;
+                setTimeout(function() {
+                    const url=document.getElementById(self.src).url;
+                    console.log("camomile url : "+url);
+                    this.camomile=new Camomile(url);
+                },1000);
                 //this.camomile.login()
             }
             static get properties() {
