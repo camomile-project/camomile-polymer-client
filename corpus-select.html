@@ -1,14 +1,38 @@
 <link rel="import"  href="/bower_components/polymer/polymer-element.html">
 
-<script>
-    // Define the class for a new element called custom-element
-    class CorpusSelect extends Polymer.Element {
-        static get is() { return "corpus-select"; }
-        constructor() {
-            super();
-            this.textContent = "I'm a corpus-select.";
+<dom-module id="corpus-select">
+
+    <template>
+        <select name="corpus">
+            <option>corpus 1</option>
+        </select>
+    </template>
+
+    <script>
+        class CorpusSelect extends Polymer.Element {
+            static get is() { return "corpus-select"; }
+            constructor() {
+                super();
+            }
+
+            ready() {
+                super.ready();
+                console.log("id: "+this.id);
+                console.log("src: "+this.src);
+
+            }
+            static get properties() {
+                return {
+                    src: {
+                        type: String
+                    },
+                    id: {
+                        type: String
+                    }
+                };
+            }
         }
-    }
-    // Register the new element with the browser
-    customElements.define(CorpusSelect.is, CorpusSelect);
-</script>
+        customElements.define(CorpusSelect.is, CorpusSelect);
+    </script>
+
+</dom-module>
