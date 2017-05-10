@@ -29,8 +29,11 @@
               const url=document.getElementById(this.src).url;
               console.log("camomile url : "+url);
               this.camomile=new Camomile(url);
+              // TODO: display login successfull/failed
               this.camomile.login(this.$.user.value,this.$.password.value)
-                .then(r => console.log(r))
+                .then(r => {
+                  this.dispatchEvent(new CustomEvent('login', {}));
+                })
                 .catch(e => console.log(e))
             }
 

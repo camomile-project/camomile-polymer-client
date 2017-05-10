@@ -1,41 +1,51 @@
-<link rel="import"  href="/bower_components/polymer/polymer-element.html">
+<link rel="import" href="/bower_components/polymer/polymer-element.html">
 
 <dom-module id="corpus-select">
 
-    <template>
-        <form action="#">
-            <select name="corpus">
-                <option>corpus 1</option>
-            </select>
-            <input type="submit" value="select" />
-        </form>
-    </template>
+  <template>
+    <form action="#">
+      <select name="corpus">
+        <option>corpus 1</option>
+      </select>
+      <input type="submit" value="select"/>
+    </form>
+  </template>
 
-    <script>
-        class CorpusSelect extends Polymer.Element {
-            static get is() { return "corpus-select"; }
-            constructor() {
-                super();
-            }
+  <script>
+    class CorpusSelect extends Polymer.Element {
+      static get is() {
+        return "corpus-select";
+      }
 
-            ready() {
-                super.ready();
-                console.log("id: "+this.id);
-                console.log("src: "+this.src);
+      constructor() {
+        super();
+      }
 
-            }
-            static get properties() {
-                return {
-                    src: {
-                        type: String
-                    },
-                    id: {
-                        type: String
-                    }
-                };
-            }
-        }
-        customElements.define(CorpusSelect.is, CorpusSelect);
-    </script>
+      ready() {
+        super.ready();
+        console.log("id: " + this.id);
+
+        console.log("src: " + this.src);
+/*
+        const loginInstance = document.getElementById(this.src);
+
+        loginInstance.addEventListener()
+        const camomile = document.getElementById(this.src).camomile;*/
+
+      }
+
+      static get properties() {
+        return {
+          src: {
+            type: String
+          },
+          id: {
+            type: String
+          }
+        };
+      }
+    }
+    customElements.define(CorpusSelect.is, CorpusSelect);
+  </script>
 
 </dom-module>

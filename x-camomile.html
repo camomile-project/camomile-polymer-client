@@ -1,35 +1,39 @@
-<link rel="import"  href="/bower_components/polymer/polymer-element.html">
+<link rel="import" href="/bower_components/polymer/polymer-element.html">
 
 <dom-module id="x-camomile">
 
-    <template>
-    </template>
+  <template>
+  </template>
 
-    <script>
-        class XCamomile extends Polymer.Element {
-            static get is() { return "x-camomile"; }
-            constructor() {
-                super();
-            }
+  <script>
+    class XCamomile extends Polymer.Element {
+      static get is() {
+        return "x-camomile";
+      }
 
-            ready() {
-                super.ready();
-                console.log("id: "+this.id);
-                console.log("url: "+this.url);
+      constructor() {
+        super();
+      }
 
-            }
-            static get properties() {
-                return {
-                    url: {
-                        type: String
-                    },
-                    id: {
-                        type: String
-                    }
-                };
-            }
-        }
-        customElements.define(XCamomile.is, XCamomile);
-    </script>
+      ready() {
+        super.ready();
+        console.log("id: " + this.id);
+        console.log("url: " + this.url);
+
+      }
+
+      static get properties() {
+        return {
+          url: {
+            type: String
+          },
+          id: {
+            type: String
+          }
+        };
+      }
+    }
+    customElements.define(XCamomile.is, XCamomile);
+  </script>
 
 </dom-module>
