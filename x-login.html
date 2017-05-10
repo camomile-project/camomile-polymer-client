@@ -25,7 +25,8 @@
                 console.log("src: "+this.src);
             }
 
-            login() {
+            login(e) {
+              e.preventDefault();
               const url=document.getElementById(this.src).url;
               console.log("camomile url : "+url);
               this.camomile=new Camomile(url);

@@ -48,9 +48,10 @@
 
       }
 
-      select() {
+      select(e) {
+        e.preventDefault();
         console.log("corpus",this.$.corpus.value);
-        this.dispatchEvent(new CustomEvent('select', {corpus:this.$.corpus.value}));
+        this.dispatchEvent(new CustomEvent('select', {detail:{corpus:this.$.corpus.value}}));
 
       }
 
