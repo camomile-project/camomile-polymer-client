@@ -32,7 +32,8 @@
               // TODO: display login successfull/failed
               this.camomile.login(this.$.user.value,this.$.password.value)
                 .then(r => {
-                  this.dispatchEvent(new CustomEvent('login', {}));
+                  console.log(r);
+                  return this.dispatchEvent(new CustomEvent('login', {}));
                 })
                 .catch(e => console.log(e));
             }

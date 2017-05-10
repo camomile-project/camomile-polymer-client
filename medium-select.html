@@ -2,14 +2,14 @@
 <link rel="import"  href="bower_components/polymer/lib/elements/dom-repeat.html">
 
 
-<dom-module id="corpus-select">
+<dom-module id="medium-select">
 
   <template>
     <form on-submit="select">
       <label>
-        Choose a corpus :
-        <select id="corpus">
-          <template is="dom-repeat" items="{{corpora}}">
+        Choose a medium :
+        <select id="medium">
+          <template is="dom-repeat" items="{{media}}">
             <option value="{{item._id}}">{{item.name}}</option>
           </template>
         </select>
@@ -19,9 +19,9 @@
   </template>
 
   <script>
-    class CorpusSelect extends Polymer.Element {
+    class MediumSelect extends Polymer.Element {
       static get is() {
-        return "corpus-select";
+        return "medium-select";
       }
 
       constructor() {
@@ -34,14 +34,14 @@
 
         console.log("src: " + this.src);
 
-        const loginInstance = document.getElementById(this.src);
+        const corpusInstance = document.getElementById(this.src);
 
-        loginInstance.addEventListener("login",() => {
-          this.client=loginInstance.camomile;
-          this.client.getCorpora()
+        corpusInstance.addEventListener("select",({corpus}) => {
+
+          corpusInstance.client.getMedia({filter:{'id_corpus': corpus}})
             .then(data => {
               console.log(data);
-              this.corpora=data;
+              this.media=data;
             })
             .catch(err => {});
         });
@@ -49,9 +49,8 @@
       }
 
       select() {
-        console.log("corpus",this.$.corpus.value);
-        this.dispatchEvent(new CustomEvent('select', {corpus:this.$.corpus.value}));
-
+        console.log("medium",this.$.medium.value);
+        this.dispatchEvent(new CustomEvent('select', {medium:this.$.medium.value}));
       }
 
       static get properties() {
@@ -65,7 +64,7 @@
         };
       }
     }
-    customElements.define(CorpusSelect.is, CorpusSelect);
+    customElements.define(MediumSelect.is, MediumSelect);
   </script>
 
 </dom-module>
