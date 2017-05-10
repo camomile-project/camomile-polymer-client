@@ -1,11 +1,15 @@
 <link rel="import" href="/bower_components/polymer/polymer-element.html">
+<link rel="import"  href="bower_components/polymer/lib/elements/dom-repeat.html">
+
 
 <dom-module id="corpus-select">
 
   <template>
-    <form action="#">
-      <select name="corpus">
-        <option>corpus 1</option>
+    <form on-submit="select">
+      <select id="corpus">
+        <template is="dom-repeat" items="{{corpora}}">
+          <option value="{{item._id}}">{{item.name}}</option>
+        </template>
       </select>
       <input type="submit" value="select"/>
     </form>
@@ -26,12 +30,23 @@
         console.log("id: " + this.id);
 
         console.log("src: " + this.src);
-/*
+
         const loginInstance = document.getElementById(this.src);
 
-        loginInstance.addEventListener()
-        const camomile = document.getElementById(this.src).camomile;*/
+        loginInstance.addEventListener("login",() => {
+          const client = loginInstance.camomile;
+          client.getCorpora()
+            .then(data => {
+              console.log(data);
+              this.corpora=data;
+            })
+            .catch(err => {});
+        });
 
+      }
+
+      select() {
+        console.log("corpus",this.$.corpus.value);
       }
 
       static get properties() {

@@ -5,10 +5,10 @@
 <dom-module id="x-login">
 
     <template>
-        <form>
+        <form on-submit="login">
             <label>User: <input type="text" id="user"/></label>
             <label>Password: <input type="password" id="password"/></label>
-            <button type="button" on-click="login">Login</button>
+            <input type="submit" value="Login" />
         </form>
     </template>
 
@@ -34,7 +34,7 @@
                 .then(r => {
                   this.dispatchEvent(new CustomEvent('login', {}));
                 })
-                .catch(e => console.log(e))
+                .catch(e => console.log(e));
             }
 
             static get properties() {
