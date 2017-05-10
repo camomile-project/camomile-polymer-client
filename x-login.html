@@ -5,10 +5,10 @@
 <dom-module id="x-login">
 
     <template>
-        <form action="#">
-            <label id="User"><input type="text" name="user"/></label>
-            <label id="Password"><input type="password" name="password"/></label>
-            <input type="submit" value="login" />
+        <form>
+            <label>User: <input type="text" id="user"/></label>
+            <label>Password: <input type="password" id="password"/></label>
+            <button type="button" on-click="login">Login</button>
         </form>
     </template>
 
@@ -23,14 +23,17 @@
                 super.ready();
                 console.log("id: "+this.id);
                 console.log("src: "+this.src);
-                const self=this;
-                setTimeout(function() {
-                    const url=document.getElementById(self.src).url;
-                    console.log("camomile url : "+url);
-                    this.camomile=new Camomile(url);
-                },1000);
-                //this.camomile.login()
             }
+
+            login() {
+              const url=document.getElementById(this.src).url;
+              console.log("camomile url : "+url);
+              this.camomile=new Camomile(url);
+              this.camomile.login(this.$.user.value,this.$.password.value)
+                .then(r => console.log(r))
+                .catch(e => console.log(e))
+            }
+
             static get properties() {
                 return {
                     src: {
