@@ -1,15 +1,24 @@
 <script src="/node_modules/camomile-client/camomile.js"></script>
 
 <link rel="import" href="/bower_components/polymer/polymer-element.html">
+<link rel="import" href="bower_components/polymer/lib/elements/dom-if.html">
 
 <dom-module id="x-login">
 
   <template>
-    <form on-submit="login">
-      <label>User: <input type="text" id="user"/></label>
-      <label>Password: <input type="password" id="password"/></label>
-      <input type="submit" value="Login"/>
-    </form>
+    <template is="dom-if" if="{{!logged_in}}">
+      <form on-submit="login">
+        <label>User: <input type="text" id="user" /></label>
+        <label>Password: <input type="password" id="password" /></label>
+        <input type="submit" value="Login"/>
+      </form>
+    </template>
+    <template is="dom-if" if="{{logged_in}}">
+      {{username}}
+      <form on-submit="logout">
+        <input type="submit" value="Logout"/>
+      </form>
+    </template>
     {{login_status}}
   </template>
 
@@ -27,6 +36,22 @@
         super.ready();
         console.log("id: " + this.id);
         console.log("src: " + this.src);
+        this.logged_in=false;
+
+
+        const camomileInstance=document.getElementById(this.src);
+        const url=camomileInstance.url;
+        console.log("camomile url : " + url);
+        this.camomile = new Camomile(url);
+        this.camomile.me()
+          .then(({username}) => {
+            this.username=username;
+            this.logged_in=true;
+            return this.dispatchEvent(new CustomEvent('login', {}));
+          })
+          .catch(err => {
+            this.logged_in=false;
+          });
       }
 
       login(e) {
@@ -34,17 +59,25 @@
         const url = document.getElementById(this.src).url;
         console.log("camomile url : " + url);
         this.camomile = new Camomile(url);
-        // TODO: display login successfull/failed
-        this.camomile.login(this.$.user.value, this.$.password.value)
+
+
+        this.camomile.login(this.shadowRoot.querySelector("#user").value, this.shadowRoot.querySelector("#password").value)
           .then(r => {
             console.log(r);
-            this.login_status="Login succeeded.";
+            this.logged_in=true;
             return this.dispatchEvent(new CustomEvent('login', {}));
           })
           .catch(e => {
             console.log(e);
             this.login_status="Login failed : "+e.message;
           });
+      }
+
+      logout(e) {
+        e.preventDefault();
+        this.camomile.logout().then(() => {
+          this.logged_in=false;
+        })
       }
 
       static get properties() {
