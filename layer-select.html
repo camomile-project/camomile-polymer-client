@@ -1,0 +1,87 @@
+<link rel="import" href="/bower_components/polymer/polymer-element.html">
+<link rel="import" href="bower_components/polymer/lib/elements/dom-repeat.html">
+
+
+<dom-module id="layer-select">
+
+  <template>
+    <form on-submit="select">
+      <label>
+        Choose a layer :
+        <select id="layer">
+          <template is="dom-repeat" items="{{layers}}">
+            <option value="{{item._id}}">{{item.name}}</option>
+          </template>
+        </select>
+      </label>
+      <input type="submit" value="select"/>
+    </form>
+  </template>
+
+  <script>
+    class LayerSelect extends Polymer.Element {
+      static get is() {
+        return "layer-select";
+      }
+
+      constructor() {
+        super();
+      }
+
+      ready() {
+        super.ready();
+        console.log("id: " + this.id);
+
+        console.log("src: " + this.src);
+
+        const corpusInstance = document.getElementById(this.src);
+
+        corpusInstance.addEventListener("select", ({detail: {corpus}}) => {
+          this.client = corpusInstance.client;
+
+          this._populateLayers(corpus);
+
+          this.client.watchCorpus(corpus, (data) => {
+            console.log(data);
+            const d=JSON.parse(data.data);
+            console.log(d);
+
+            // add layer specified or just refresh the whole layers
+            this._populateLayers(corpus);
+
+          });
+        });
+
+      }
+
+      _populateLayers(corpus) {
+        this.client.getLayers({filter: {'id_corpus': corpus}})
+          .then(data => {
+            console.log(data);
+            this.layers = data;
+          })
+          .catch(err => {
+          });
+      }
+
+      select(e) {
+        e.preventDefault();
+        console.log("layer", this.$.layer.value);
+        this.dispatchEvent(new CustomEvent('select', {detail: {layer: this.$.layer.value}}));
+      }
+
+      static get properties() {
+        return {
+          src: {
+            type: String
+          },
+          id: {
+            type: String
+          }
+        };
+      }
+    }
+    customElements.define(LayerSelect.is, LayerSelect);
+  </script>
+
+</dom-module>

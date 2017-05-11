@@ -1,0 +1,63 @@
+<link rel="import" href="/bower_components/polymer/polymer-element.html">
+
+<dom-module id="layer-create">
+
+  <template>
+    <div>
+      Layer creation :
+      <form on-submit="create">
+        <label>Name : <input type="text" id="name"/></label>
+        <label>Description : <input type="text" id="description"/></label>
+        <label>Fragment type : <input type="text" id="fragment_type"/></label>
+        <label>Data type : <input type="text" id="data_type"/></label>
+        <input type="submit" value="Create"/>
+      </form>
+      {{creation_status}}
+    </div>
+  </template>
+
+  <script>
+    class LayerCreate extends Polymer.Element {
+      static get is() {
+        return "layer-create";
+      }
+
+      constructor() {
+        super();
+      }
+
+      ready() {
+        super.ready();
+
+        const corpusInstance = document.getElementById(this.src);
+        corpusInstance.addEventListener("select", ({detail: {corpus}}) => {
+          this.client = corpusInstance.client;
+          this.corpus = corpus;
+        });
+      }
+
+      create(e) {
+        e.preventDefault();
+        this.client.createLayer(this.corpus,this.$.name.value,this.$.description.value,this.$.fragment_type.value,this.$.data_type.value)
+          .then(() => this.creation_status="Creation succeeded.")
+          .catch(e => {
+            this.creation_status="Creation failed : "+e.message;
+            console.log(e)
+          });
+      }
+
+      static get properties() {
+        return {
+          src: {
+            type: String
+          },
+          id: {
+            type: String
+          }
+        };
+      }
+    }
+    customElements.define(LayerCreate.is, LayerCreate);
+  </script>
+
+</dom-module>
