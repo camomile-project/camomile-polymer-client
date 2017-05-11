@@ -43,6 +43,10 @@
         const url=camomileInstance.url;
         console.log("camomile url : " + url);
         this.camomile = new Camomile(url);
+        this.authenticate();
+      }
+
+      authenticate() {
         this.camomile.me()
           .then(({username}) => {
             this.username=username;
@@ -64,7 +68,7 @@
         this.camomile.login(this.shadowRoot.querySelector("#user").value, this.shadowRoot.querySelector("#password").value)
           .then(r => {
             console.log(r);
-            this.logged_in=true;
+            this.authenticate();
             return this.dispatchEvent(new CustomEvent('login', {}));
           })
           .catch(e => {
