@@ -1,5 +1,5 @@
 <link rel="import" href="/bower_components/polymer/polymer-element.html">
-<link rel="import"  href="bower_components/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="bower_components/polymer/lib/elements/dom-repeat.html">
 
 
 <dom-module id="corpus-select">
@@ -36,22 +36,23 @@
 
         const loginInstance = document.getElementById(this.src);
 
-        loginInstance.addEventListener("login",() => {
-          this.client=loginInstance.camomile;
+        loginInstance.addEventListener("login", () => {
+          this.client = loginInstance.camomile;
           this.client.getCorpora()
             .then(data => {
               console.log(data);
-              this.corpora=data;
+              this.corpora = data;
             })
-            .catch(err => {});
+            .catch(err => {
+            });
         });
 
       }
 
       select(e) {
         e.preventDefault();
-        console.log("corpus",this.$.corpus.value);
-        this.dispatchEvent(new CustomEvent('select', {detail:{corpus:this.$.corpus.value}}));
+        console.log("corpus", this.$.corpus.value);
+        this.dispatchEvent(new CustomEvent('select', {detail: {corpus: this.$.corpus.value}}));
 
       }
 

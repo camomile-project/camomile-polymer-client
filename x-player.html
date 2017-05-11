@@ -1,4 +1,4 @@
-<link rel="import"  href="/bower_components/polymer/polymer-element.html">
+<link rel="import" href="/bower_components/polymer/polymer-element.html">
 
 <dom-module id="x-player">
 
@@ -8,22 +8,25 @@
 
   <script>
     class XPlayer extends Polymer.Element {
-      static get is() { return "x-player"; }
+      static get is() {
+        return "x-player";
+      }
+
       constructor() {
         super();
       }
 
       ready() {
         super.ready();
-        console.log("id: "+this.id);
-        console.log("src: "+this.src);
+        console.log("id: " + this.id);
+        console.log("src: " + this.src);
 
 
         const mediumInstance = document.getElementById(this.src);
 
-        mediumInstance.addEventListener("select",({detail:{medium}}) => {
+        mediumInstance.addEventListener("select", ({detail: {medium}}) => {
 
-          this.medium_url=mediumInstance.client.getMediumURL(medium,'mp4');
+          this.medium_url = mediumInstance.client.getMediumURL(medium, 'mp4');
         });
       }
 

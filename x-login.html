@@ -1,56 +1,60 @@
 <script src="/node_modules/camomile-client/camomile.js"></script>
 
-<link rel="import"  href="/bower_components/polymer/polymer-element.html">
+<link rel="import" href="/bower_components/polymer/polymer-element.html">
 
 <dom-module id="x-login">
 
-    <template>
-        <form on-submit="login">
-            <label>User: <input type="text" id="user"/></label>
-            <label>Password: <input type="password" id="password"/></label>
-            <input type="submit" value="Login" />
-        </form>
-    </template>
+  <template>
+    <form on-submit="login">
+      <label>User: <input type="text" id="user"/></label>
+      <label>Password: <input type="password" id="password"/></label>
+      <input type="submit" value="Login"/>
+    </form>
 
-    <script>
-        class XLogin extends Polymer.Element {
-            static get is() { return "x-login"; }
-            constructor() {
-                super();
-            }
+  </template>
 
-            ready() {
-                super.ready();
-                console.log("id: "+this.id);
-                console.log("src: "+this.src);
-            }
+  <script>
+    class XLogin extends Polymer.Element {
+      static get is() {
+        return "x-login";
+      }
 
-            login(e) {
-              e.preventDefault();
-              const url=document.getElementById(this.src).url;
-              console.log("camomile url : "+url);
-              this.camomile=new Camomile(url);
-              // TODO: display login successfull/failed
-              this.camomile.login(this.$.user.value,this.$.password.value)
-                .then(r => {
-                  console.log(r);
-                  return this.dispatchEvent(new CustomEvent('login', {}));
-                })
-                .catch(e => console.log(e));
-            }
+      constructor() {
+        super();
+      }
 
-            static get properties() {
-                return {
-                    src: {
-                        type: String
-                    },
-                    id: {
-                        type: String
-                    }
-                };
-            }
-        }
-        customElements.define(XLogin.is, XLogin);
-    </script>
+      ready() {
+        super.ready();
+        console.log("id: " + this.id);
+        console.log("src: " + this.src);
+      }
+
+      login(e) {
+        e.preventDefault();
+        const url = document.getElementById(this.src).url;
+        console.log("camomile url : " + url);
+        this.camomile = new Camomile(url);
+        // TODO: display login successfull/failed
+        this.camomile.login(this.$.user.value, this.$.password.value)
+          .then(r => {
+            console.log(r);
+            return this.dispatchEvent(new CustomEvent('login', {}));
+          })
+          .catch(e => console.log(e));
+      }
+
+      static get properties() {
+        return {
+          src: {
+            type: String
+          },
+          id: {
+            type: String
+          }
+        };
+      }
+    }
+    customElements.define(XLogin.is, XLogin);
+  </script>
 
 </dom-module>
