@@ -13,25 +13,16 @@
   </head>
 
   <body>
+    <x-camomile id="camomile1" url="http://localhost:3000"></x-camomile>
     <div>
-      <x-camomile id="camomile1" url="http://localhost:3000" />
+      <x-login src="camomile1" id="user1"></x-login>
     </div>
     <div>
-      <x-login src="camomile1" id="user1" />
-    </div>
-    <br />
-    <div>
-      <corpus-select src="user1" id="corpus1" />
-    </div>
-    <div>
-      <medium-select src="corpus1" id="medium1" />
-    </div>
-    <div>
-      <x-player src="medium1" />
-      <x-segmentation />
-    </div>
-    <div>
-      <corpus-create id="create1" src="user1" />
+      <corpus-select src="user1" id="corpus1"></corpus-select>
+      <medium-select src="corpus1" id="medium1"></medium-select>
+      <x-player src="medium1"></x-player>
+      <x-segmentation></x-segmentation>
+      <corpus-create id="create1" src="user1"></corpus-create>
     </div>
   </body>
 </html>
