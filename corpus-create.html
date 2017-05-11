@@ -10,6 +10,7 @@
       <label>License : <textarea id="license"></textarea></label>
       <input type="submit" value="Create"/>
     </form>
+    {{creation_status}}
   </template>
 
   <script>
@@ -31,7 +32,9 @@
 
       create(e) {
         e.preventDefault();
-        this.client.createCorpus(this.$.name.value, {license: this.$.license.value});
+        this.client.createCorpus(this.$.name.value, {license: this.$.license.value})
+          .then(() => this.creation_status="Creation succeeded.")
+          .catch(e => this.creation_status="Creation failed : "+e.message);
       }
 
       static get properties() {

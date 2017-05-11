@@ -10,7 +10,7 @@
       <label>Password: <input type="password" id="password"/></label>
       <input type="submit" value="Login"/>
     </form>
-
+    {{login_status}}
   </template>
 
   <script>
@@ -38,9 +38,13 @@
         this.camomile.login(this.$.user.value, this.$.password.value)
           .then(r => {
             console.log(r);
+            this.login_status="Login succeeded.";
             return this.dispatchEvent(new CustomEvent('login', {}));
           })
-          .catch(e => console.log(e));
+          .catch(e => {
+            console.log(e);
+            this.login_status="Login failed : "+e.message;
+          });
       }
 
       static get properties() {
