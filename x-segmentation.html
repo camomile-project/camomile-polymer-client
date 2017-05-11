@@ -1,0 +1,88 @@
+<link rel="import" href="/bower_components/polymer/polymer-element.html">
+<link rel="import" href="bower_components/polymer/lib/elements/dom-repeat.html">
+
+
+<dom-module id="x-segmentation">
+
+  <template>
+    <table>
+      <tr><th>Beginning</th><th>End</th><th>Label</th></tr>
+      <template is="dom-repeat" items="{{annotations}}">
+        <tr><td>{{item.fragment.start}}</td><td>{{item.fragment.end}}</td><td>{{item.data}}</td></tr>
+      </template>
+    </table>
+  </template>
+
+  <script>
+    class XSegmentation extends Polymer.Element {
+      static get is() {
+        return "x-segmentation";
+      }
+
+      constructor() {
+        super();
+      }
+
+      ready() {
+        super.ready();
+        console.log("id: " + this.id);
+
+        console.log("srcLayer: " + this.srcLayer);
+        console.log("srcMedium: " + this.srcMedium);
+
+        const layerInstance = document.getElementById(this.srcLayer);
+
+        layerInstance.addEventListener("select", ({detail: {layer}}) => {
+          this.client = layerInstance.client;
+
+          this.layer=layer;
+          if(this.medium)
+            this._populateAnnotations(this.layer,this.medium);
+
+          this.client.watchLayer(layer, (data) => {
+            console.log(data);
+            const d=JSON.parse(data.data);
+            console.log(d);
+
+            // add medium specified or just refresh the whole media
+            this._populateAnnotations(layer);
+
+          });
+        });
+
+
+        const mediumInstance = document.getElementById(this.srcMedium);
+
+        mediumInstance.addEventListener("select", ({detail: {medium}}) => {
+          this.client = mediumInstance.client;
+          this.medium=medium;
+
+          if(this.layer)
+            this._populateAnnotations(this.layer,this.medium);
+        });
+
+      }
+
+      _populateAnnotations(layer,medium) {
+        console.log("plop");
+        this.client.getAnnotations({filter:{id_layer:layer,id_medium:medium}})
+          .then(data => {
+            console.log(data);
+            this.annotations = data;
+          })
+          .catch(err => {
+          });
+      }
+
+      static get properties() {
+        return {
+          srcLayer: String,
+          srcMedium: String,
+          id: String
+        };
+      }
+    }
+    customElements.define(XSegmentation.is, XSegmentation);
+  </script>
+
+</dom-module>
