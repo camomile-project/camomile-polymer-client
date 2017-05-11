@@ -39,15 +39,29 @@
         corpusInstance.addEventListener("select", ({detail: {corpus}}) => {
           this.client = corpusInstance.client;
 
-          this.client.getMedia({filter: {'id_corpus': corpus}})
-            .then(data => {
-              console.log(data);
-              this.media = data;
-            })
-            .catch(err => {
-            });
+          this._populateMedia(corpus);
+
+          this.client.watchCorpus(corpus, (data) => {
+            console.log(data);
+            const d=JSON.parse(data.data);
+            console.log(d);
+
+            // add medium specified or just refresh the whole media
+            this._populateMedia(corpus);
+
+          });
         });
 
+      }
+
+      _populateMedia(corpus) {
+        this.client.getMedia({filter: {'id_corpus': corpus}})
+          .then(data => {
+            console.log(data);
+            this.media = data;
+          })
+          .catch(err => {
+          });
       }
 
       select(e) {
