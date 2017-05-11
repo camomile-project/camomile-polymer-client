@@ -2,7 +2,7 @@
 <link rel="import" href="bower_components/polymer/lib/elements/dom-repeat.html">
 
 
-<dom-module id="corpus-select">
+<dom-module id="camomile-corpus-select">
 
   <template>
     <form on-submit="select">
@@ -19,9 +19,9 @@
   </template>
 
   <script>
-    class CorpusSelect extends Polymer.Element {
+    class CamomileCorpusSelect extends Polymer.Element {
       static get is() {
-        return "corpus-select";
+        return "camomile-corpus-select";
       }
 
       constructor() {
@@ -67,7 +67,7 @@
         };
       }
     }
-    customElements.define(CorpusSelect.is, CorpusSelect);
+    customElements.define(CamomileCorpusSelect.is, CamomileCorpusSelect);
   </script>
 
 </dom-module>

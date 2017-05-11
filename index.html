@@ -4,36 +4,36 @@
     <meta charset="UTF-8">
     <title>Camomile client polymer</title>
     <script src="/bower_components/webcomponentsjs/webcomponents-loader.js"></script>
-    <link rel="import" href="x-camomile.html">
-    <link rel="import" href="x-login.html">
-    <link rel="import" href="corpus-select.html">
-    <link rel="import" href="medium-select.html">
-    <link rel="import" href="x-player.html">
-    <link rel="import" href="corpus-create.html">
-    <link rel="import" href="medium-create.html">
-    <link rel="import" href="layer-select.html">
-    <link rel="import" href="layer-create.html">
-    <link rel="import" href="x-segmentation.html">
+    <link rel="import" href="camomile-endpoint.html">
+    <link rel="import" href="camomile-login.html">
+    <link rel="import" href="camomile-corpus-select.html">
+    <link rel="import" href="camomile-medium-select.html">
+    <link rel="import" href="camomile-player.html">
+    <link rel="import" href="camomile-corpus-create.html">
+    <link rel="import" href="camomile-medium-create.html">
+    <link rel="import" href="camomile-layer-select.html">
+    <link rel="import" href="camomile-layer-create.html">
+    <link rel="import" href="camomile-segmentation.html">
   </head>
 
   <body>
-    <x-camomile id="camomile1" url="http://localhost:3000"></x-camomile>
+    <camomile-endpoint id="camomile1" url="http://localhost:3000"></camomile-endpoint>
     <div>
-      <x-login src="camomile1" id="user1"></x-login>
+      <camomile-login src="camomile1" id="user1"></camomile-login>
     </div>
     <div>
-      <corpus-select src="user1" id="corpus1"></corpus-select>
-      <medium-select src="corpus1" id="medium1"></medium-select>
-      <corpus-create id="createCorpus1" src="user1"></corpus-create>
+      <camomile-corpus-select src="user1" id="corpus1"></camomile-corpus-select>
+      <camomile-medium-select src="corpus1" id="medium1"></camomile-medium-select>
+      <camomile-corpus-create id="createCorpus1" src="user1"></camomile-corpus-create>
       <br />
-      <medium-create id="createMedium1" src="corpus1"></medium-create>
+      <camomile-medium-create id="createMedium1" src="corpus1"></camomile-medium-create>
       <br />
-      <layer-create id="createLayer" src="corpus1"></layer-create>
+      <camomile-layer-create id="createLayer" src="corpus1"></camomile-layer-create>
 
       <br />
-      <layer-select id="layer1" src="corpus1"></layer-select>
-      <x-player src="medium1"></x-player>
-      <x-segmentation src-layer="layer1" src-medium="medium1" id="segmentation1"></x-segmentation>
+      <camomile-layer-select id="layer1" src="corpus1"></camomile-layer-select>
+      <camomile-player src="medium1"></camomile-player>
+      <camomile-segmentation src-layer="layer1" src-medium="medium1" id="segmentation1"></camomile-segmentation>
     </div>
   </body>
 </html>

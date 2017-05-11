@@ -2,14 +2,14 @@
 <link rel="import" href="bower_components/polymer/lib/elements/dom-repeat.html">
 
 
-<dom-module id="medium-select">
+<dom-module id="camomile-layer-select">
 
   <template>
     <form on-submit="select">
       <label>
-        Choose a medium :
-        <select id="medium">
-          <template is="dom-repeat" items="{{media}}">
+        Choose a layer :
+        <select id="layer">
+          <template is="dom-repeat" items="{{layers}}">
             <option value="{{item._id}}">{{item.name}}</option>
           </template>
         </select>
@@ -19,9 +19,9 @@
   </template>
 
   <script>
-    class MediumSelect extends Polymer.Element {
+    class CamomileLayerSelect extends Polymer.Element {
       static get is() {
-        return "medium-select";
+        return "camomile-layer-select";
       }
 
       constructor() {
@@ -39,26 +39,26 @@
         corpusInstance.addEventListener("select", ({detail: {corpus}}) => {
           this.client = corpusInstance.client;
 
-          this._populateMedia(corpus);
+          this._populateLayers(corpus);
 
           this.client.watchCorpus(corpus, (data) => {
             console.log(data);
             const d=JSON.parse(data.data);
             console.log(d);
 
-            // add medium specified or just refresh the whole media
-            this._populateMedia(corpus);
+            // add layer specified or just refresh the whole layers
+            this._populateLayers(corpus);
 
           });
         });
 
       }
 
-      _populateMedia(corpus) {
-        this.client.getMedia({filter: {'id_corpus': corpus}})
+      _populateLayers(corpus) {
+        this.client.getLayers({filter: {'id_corpus': corpus}})
           .then(data => {
             console.log(data);
-            this.media = data;
+            this.layers = data;
           })
           .catch(err => {
           });
@@ -66,8 +66,8 @@
 
       select(e) {
         e.preventDefault();
-        console.log("medium", this.$.medium.value);
-        this.dispatchEvent(new CustomEvent('select', {detail: {medium: this.$.medium.value}}));
+        console.log("layer", this.$.layer.value);
+        this.dispatchEvent(new CustomEvent('select', {detail: {layer: this.$.layer.value}}));
       }
 
       static get properties() {
@@ -81,7 +81,7 @@
         };
       }
     }
-    customElements.define(MediumSelect.is, MediumSelect);
+    customElements.define(CamomileLayerSelect.is, CamomileLayerSelect);
   </script>
 
 </dom-module>
