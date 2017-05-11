@@ -1,0 +1,62 @@
+<link rel="import" href="/bower_components/polymer/polymer-element.html">
+
+<dom-module id="medium-create">
+
+  <template>
+    <div>
+      Medium creation :
+      <form on-submit="create">
+        <label>Name : <input type="text" id="name"/></label>
+        <label>Url : <input type="text" id="url"/></label>
+        <label>Description : <input type="text" id="description"/></label>
+        <input type="submit" value="Create"/>
+      </form>
+      {{creation_status}}
+    </div>
+  </template>
+
+  <script>
+    class MediumCreate extends Polymer.Element {
+      static get is() {
+        return "medium-create";
+      }
+
+      constructor() {
+        super();
+      }
+
+      ready() {
+        super.ready();
+
+        const corpusInstance = document.getElementById(this.src);
+        corpusInstance.addEventListener("select", ({detail: {corpus}}) => {
+          this.client = corpusInstance.client;
+          this.corpus = corpus;
+        });
+      }
+
+      create(e) {
+        e.preventDefault();
+        this.client.createMedium(this.corpus,this.$.name.value,this.$.url.value,this.$.description.value)
+          .then(() => this.creation_status="Creation succeeded.")
+          .catch(e => {
+            this.creation_status="Creation failed : "+e.message;
+            console.log(e)
+          });
+      }
+
+      static get properties() {
+        return {
+          src: {
+            type: String
+          },
+          id: {
+            type: String
+          }
+        };
+      }
+    }
+    customElements.define(MediumCreate.is, MediumCreate);
+  </script>
+
+</dom-module>

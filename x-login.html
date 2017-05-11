@@ -42,12 +42,12 @@
         const camomileInstance=document.getElementById(this.src);
         const url=camomileInstance.url;
         console.log("camomile url : " + url);
-        this.camomile = new Camomile(url);
+        this.client = new Camomile(url);
         this.authenticate();
       }
 
       authenticate() {
-        this.camomile.me()
+        this.client.me()
           .then(({username}) => {
             this.username=username;
             this.logged_in=true;
@@ -62,10 +62,10 @@
         e.preventDefault();
         const url = document.getElementById(this.src).url;
         console.log("camomile url : " + url);
-        this.camomile = new Camomile(url);
+        this.client = new Camomile(url);
 
 
-        this.camomile.login(this.shadowRoot.querySelector("#user").value, this.shadowRoot.querySelector("#password").value)
+        this.client.login(this.shadowRoot.querySelector("#user").value, this.shadowRoot.querySelector("#password").value)
           .then(r => {
             console.log(r);
             this.authenticate();
@@ -79,7 +79,7 @@
 
       logout(e) {
         e.preventDefault();
-        this.camomile.logout().then(() => {
+        this.client.logout().then(() => {
           this.logged_in=false;
         })
       }

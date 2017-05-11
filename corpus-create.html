@@ -1,16 +1,17 @@
 <link rel="import" href="/bower_components/polymer/polymer-element.html">
-<link rel="import" href="bower_components/polymer/lib/elements/dom-repeat.html">
-
 
 <dom-module id="corpus-create">
 
   <template>
-    <form on-submit="create">
-      <label>Name : <input type="text" id="name"/></label>
-      <label>License : <textarea id="license"></textarea></label>
-      <input type="submit" value="Create"/>
-    </form>
-    {{creation_status}}
+    <div>
+      Corpus creation :
+      <form on-submit="create">
+        <label>Name : <input type="text" id="name"/></label>
+        <label>License : <input type="text" id="license"/></label>
+        <input type="submit" value="Create"/>
+      </form>
+      {{creation_status}}
+    </div>
   </template>
 
   <script>
@@ -27,7 +28,7 @@
         super.ready();
 
         const loginInstance = document.getElementById(this.src);
-        loginInstance.addEventListener("login", () => this.client = loginInstance.camomile);
+        loginInstance.addEventListener("login", () => this.client = loginInstance.client);
       }
 
       create(e) {

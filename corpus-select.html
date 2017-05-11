@@ -37,7 +37,7 @@
         const loginInstance = document.getElementById(this.src);
 
         loginInstance.addEventListener("login", () => {
-          this.client = loginInstance.camomile;
+          this.client = loginInstance.client;
           this.client.getCorpora()
             .then(data => {
               console.log(data);
