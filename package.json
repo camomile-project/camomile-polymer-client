@@ -17,6 +17,6 @@
   },
   "homepage": "https://github.com/rom1504/camomile-polymer-client#readme",
   "dependencies": {
-    "camomile-client": "^0.8.0"
+    "camomile-client": "rom1504/camomile-client-javascript#patch-1"
   }
 }

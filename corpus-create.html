@@ -1,0 +1,51 @@
+<link rel="import" href="/bower_components/polymer/polymer-element.html">
+<link rel="import"  href="bower_components/polymer/lib/elements/dom-repeat.html">
+
+
+<dom-module id="corpus-create">
+
+    <template>
+        <form on-submit="create">
+            <label>Name : <input type="text" id="name"/></label>
+            <label>License : <textarea id="license"></textarea></label>
+            <input type="submit" value="Create"/>
+        </form>
+    </template>
+
+    <script>
+      class CorpusCreate extends Polymer.Element {
+        static get is() {
+          return "corpus-create";
+        }
+
+        constructor() {
+          super();
+        }
+
+        ready() {
+          super.ready();
+
+          const loginInstance = document.getElementById(this.src);
+          loginInstance.addEventListener("login",() => this.client=loginInstance.camomile);
+        }
+
+        create(e) {
+          e.preventDefault();
+          this.client.createCorpus(this.$.name.value,{license:this.$.license.value});
+        }
+
+        static get properties() {
+          return {
+            src: {
+              type: String
+            },
+            id: {
+              type: String
+            }
+          };
+        }
+      }
+      customElements.define(CorpusCreate.is, CorpusCreate);
+    </script>
+
+</dom-module>
