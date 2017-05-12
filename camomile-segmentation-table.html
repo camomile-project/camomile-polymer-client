@@ -1,46 +1,26 @@
 <link rel="import" href="/bower_components/polymer/polymer-element.html">
 <link rel="import" href="bower_components/polymer/lib/elements/dom-repeat.html">
 
-<script src="node_modules/vis/dist/vis.js"></script>
 
+<dom-module id="camomile-segmentation-table">
 
-<dom-module id="camomile-segmentation">
-
-  <link rel="import" type="css" href="node_modules/vis/dist/vis-timeline-graph2d.min.css">
   <template>
-
-    <div id="visualization"></div>
-
+    <table>
+      <tr><th>Beginning</th><th>End</th><th>Label</th></tr>
+      <template is="dom-repeat" items="{{annotations}}">
+        <tr><td>{{item.fragment.start}}</td><td>{{item.fragment.end}}</td><td>{{item.data}}</td></tr>
+      </template>
+    </table>
   </template>
 
   <script>
-    // TODO : fix simple click
-    class CamomileSegmentation extends Polymer.Element {
+    class CamomileSegmentationTable extends Polymer.Element {
       static get is() {
-        return "camomile-segmentation";
+        return "camomile-segmentation-table";
       }
 
       constructor() {
         super();
-      }
-
-      _loadVis() {
-        this.items = new vis.DataSet({
-          type: { start: 'Number', end: 'Number' }
-        });
-
-
-        const container = this.$.visualization;
-        const options = {
-          start: 0,
-          end: 1000,
-          height: '300px',
-          multiselect: true,
-          editable: true,
-          showCurrentTime: true
-        };
-
-        const timeline = new vis.Timeline(container, this.items, options);
       }
 
       ready() {
@@ -64,7 +44,6 @@
             const d=JSON.parse(data.data);
             console.log(d);
 
-
             // add medium specified or just refresh the whole media
             this._populateAnnotations(layer);
 
@@ -82,26 +61,14 @@
             this._populateAnnotations(this.layer,this.medium);
         });
 
-        this._loadVis();
-
       }
 
       _populateAnnotations(layer,medium) {
+        console.log("plop");
         this.client.getAnnotations({filter:{id_layer:layer,id_medium:medium}})
           .then(data => {
             console.log(data);
-
-            this.items.clear();
-            this.items.add(data.map(({_id,fragment:{start,end},data}) => ({
-              id:_id,
-              start,
-              end,
-              content:data
-            })));
-
-            this.items.on('*', function (event, properties) {
-              console.log(event, properties.items);
-            });
+            this.annotations = data;
           })
           .catch(err => {
           });
@@ -115,7 +82,7 @@
         };
       }
     }
-    customElements.define(CamomileSegmentation.is, CamomileSegmentation);
+    customElements.define(CamomileSegmentationTable.is, CamomileSegmentationTable);
   </script>
 
 </dom-module>

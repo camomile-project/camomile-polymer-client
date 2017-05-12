@@ -14,6 +14,7 @@
     <link rel="import" href="camomile-layer-select.html">
     <link rel="import" href="camomile-layer-create.html">
     <link rel="import" href="camomile-segmentation.html">
+    <link rel="import" href="camomile-segmentation-table.html">
   </head>
 
   <body>
@@ -33,7 +34,13 @@
       <br />
       <camomile-layer-select id="layer1" src="corpus1"></camomile-layer-select>
       <camomile-player src="medium1"></camomile-player>
-      <camomile-segmentation src-layer="layer1" src-medium="medium1" id="segmentation1"></camomile-segmentation>
+
+      <br />
+
+      <camomile-segmentation src-layer="layer1" src-medium="medium1" id="segmentation1" ></camomile-segmentation>
+      <camomile-segmentation-table src-layer="layer1" src-medium="medium1" id="segmentation2" ></camomile-segmentation-table>
+
+
     </div>
   </body>
 </html>
