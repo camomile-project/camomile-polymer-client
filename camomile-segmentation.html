@@ -161,7 +161,7 @@
 
             this.items.clear();
             this.items.add(data.map(CamomileSegmentation._transformItem));
-            this.timeline.setWindow(data[0].fragment.start,data[0].fragment.start+100);
+            this.timeline.setWindow(data[0].fragment.start,data[0].fragment.start+100,{animation:false});
 
 
             this.items.on('*', (event, properties) => {
