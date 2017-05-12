@@ -9,6 +9,11 @@
   <link rel="import" type="css" href="node_modules/vis/dist/vis-timeline-graph2d.min.css">
   <template>
 
+    <form id="edit" style="display:none;">
+      <label>Label : <input type="text" id="label" /></label>
+      <input type="submit" value="Validate" />
+    </form>
+
     <div id="visualization"></div>
 
   </template>
@@ -37,7 +42,42 @@
           height: '300px',
           multiselect: true,
           editable: true,
-          showCurrentTime: true
+          showCurrentTime: true,
+          onAdd: (item, callback) => {
+            this.$.edit.style="display: block";
+            this.$.label.focus();
+
+            this.$.edit.onsubmit=(e) => {
+              e.preventDefault();
+              item.content=this.$.label.value;
+              item.end=item.start+100;
+              this.$.label.value="";
+              this.$.edit.style="display:none";
+              this.$.edit.onsubmit=null;
+              const {start,end,content}=item;
+              this.client.createAnnotation(this.layer,this.medium,{start,end},content)
+                .then(result => {
+                  item.id=result._id;
+                  callback(item);
+                });
+            };
+          },
+
+          // doesn't work yet : needs clicking
+          onUpdate: (item, callback) => {
+            this.$.edit.style="display: block";
+            this.$.label.focus();
+            this.$.label.value=item.content;
+
+            this.$.edit.onsubmit=(e) => {
+              e.preventDefault();
+              item.content=this.$.label.value;
+              this.$.label.value="";
+              this.$.edit.style="display:none";
+              this.$.edit.onsubmit=null;
+              callback(item);
+            };
+          },
         };
 
         this.timeline = new vis.Timeline(container, this.items, options);
@@ -76,8 +116,15 @@
             }
 
 
-            // add medium specified or just refresh the whole media
-            //this._populateAnnotations(layer);
+            if(d.event['add_annotation']) {
+              this.client.getAnnotation(d.event['add_annotation'])
+                .then(data => {
+                  if(this.items.get(d.event['add_annotation']))
+                    return;
+                  this.items.add(CamomileSegmentation._transformItem(data),17);
+                })
+            }
+
 
           });
         });
@@ -114,6 +161,11 @@
 
             this.items.clear();
             this.items.add(data.map(CamomileSegmentation._transformItem));
+            //this.timeline.fit({duration:0});
+            //this.timeline.focus(data[0]._id,{duration:0});
+            this.timeline.zoomIn(1,false)
+            setTimeout(() => this.timeline.zoomIn(1,false));
+
 
             this.items.on('*', (event, properties) => {
               console.log(event, properties.items);
