@@ -64,6 +64,13 @@
             const d=JSON.parse(data.data);
             console.log(d);
 
+            if(d.event['update_annotation']) {
+              this.client.getAnnotation(d.event['update_annotation'])
+                .then(data => {
+                  this.items.update(CamomileSegmentation._transformItem(data),17);
+                })
+            }
+
 
             // add medium specified or just refresh the whole media
             //this._populateAnnotations(layer);
@@ -86,26 +93,35 @@
 
       }
 
+      static _transformItem({_id,fragment:{start,end},data})
+      {
+        return {
+          id: _id,
+          start,
+          end,
+          content: data
+        }
+      }
+
       _populateAnnotations(layer,medium) {
         this.client.getAnnotations({filter:{id_layer:layer,id_medium:medium}})
           .then(data => {
             console.log(data);
 
             this.items.clear();
-            this.items.add(data.map(({_id,fragment:{start,end},data}) => ({
-              id:_id,
-              start,
-              end,
-              content:data
-            })));
+            this.items.add(data.map(CamomileSegmentation._transformItem));
 
             this.items.on('*', (event, properties) => {
               console.log(event, properties.items);
             });
-            this.items.on('remove', (event, properties) => {
+            this.items.on('remove', (event, properties,senderId) => {
+              if(senderId===17)
+                return;
               properties.items.forEach(annotation => this.client.deleteAnnotation(annotation));
             });
-            this.items.on('update', (event, properties) => {
+            this.items.on('update', (event, properties,senderId) => {
+              if(senderId===17)
+                return;
               properties.items.forEach(annotation => {
                 this.client.updateAnnotation(annotation,{
                 fragment:{
