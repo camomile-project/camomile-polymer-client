@@ -71,6 +71,10 @@
                 })
             }
 
+            if(d.event['delete_annotation']) {
+              this.items.remove(d.event['delete_annotation'],17);
+            }
+
 
             // add medium specified or just refresh the whole media
             //this._populateAnnotations(layer);
