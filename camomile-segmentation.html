@@ -161,10 +161,7 @@
 
             this.items.clear();
             this.items.add(data.map(CamomileSegmentation._transformItem));
-            //this.timeline.fit({duration:0});
-            //this.timeline.focus(data[0]._id,{duration:0});
-            this.timeline.zoomIn(1,false)
-            setTimeout(() => this.timeline.zoomIn(1,false));
+            this.timeline.setWindow(data[0].fragment.start,data[0].fragment.start+100);
 
 
             this.items.on('*', (event, properties) => {
