@@ -45,7 +45,7 @@
             console.log(d);
 
             // add medium specified or just refresh the whole media
-            this._populateAnnotations(layer);
+            this._populateAnnotations(this.layer,this.medium);
 
           });
         });
@@ -64,11 +64,11 @@
       }
 
       _populateAnnotations(layer,medium) {
-        console.log("plop");
+        console.log("plop",layer,medium);
         this.client.getAnnotations({filter:{id_layer:layer,id_medium:medium}})
           .then(data => {
             console.log(data);
-            this.annotations = data;
+            this.annotations = data.sort((a,b) => a.fragment.start - b.fragment.start);
           })
           .catch(err => {
           });
