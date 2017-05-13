@@ -2,10 +2,45 @@
 
 <dom-module id="camomile-endpoint">
 
+
   <template>
+    <template is="dom-if" if="{{!endPointSet}}">
+      <form on-submit="setEndPoint">
+        <label>Endpoint: <input type="text" id="endpoint" /></label>
+        <input type="submit" value="Set endpoint"/>
+      </form>
+    </template>
+    <template is="dom-if" if="{{endPointSet}}">
+      {{url}}
+      <form on-submit="resetEndPoint">
+        <input type="submit" value="Reset endpoint"/>
+      </form>
+    </template>
   </template>
 
   <script>
+    function setCookie(cname, cvalue, exdays) {
+      const d = new Date();
+      d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+      const expires = "expires="+d.toUTCString();
+      document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+    }
+
+    function getCookie(cname) {
+      const name = cname + "=";
+      const ca = document.cookie.split(';');
+      for(let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) === ' ') {
+          c = c.substring(1);
+        }
+        if (c.indexOf(name) === 0) {
+          return c.substring(name.length, c.length);
+        }
+      }
+      return "";
+    }
+
     class CamomileEndpoint extends Polymer.Element {
       static get is() {
         return "camomile-endpoint";
@@ -18,17 +53,40 @@
       ready() {
         super.ready();
         console.log("id: " + this.id);
+        this.endPointSet=!!this.url;
+
+        if(!this.url) {
+          const v=getCookie("endpoint");
+          if(v!=="") {
+            this.url=v;
+            this.endPointSet=true;
+          }
+        }
+
+
         console.log("url: " + this.url);
+      }
+
+      setEndPoint(e) {
+        e.preventDefault();
+
+
+        this.url=this.shadowRoot.querySelector("#endpoint").value;
+        this.endPointSet=true;
+        setCookie("endpoint",this.url,10);
+      }
+
+      resetEndPoint(e) {
+        e.preventDefault();
+        this.url=null;
+        this.endPointSet=false;
+        setCookie("endpoint","",0);
       }
 
       static get properties() {
         return {
-          url: {
-            type: String
-          },
-          id: {
-            type: String
-          }
+          url:String,
+          id:String
         };
       }
     }
