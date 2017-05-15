@@ -37,7 +37,12 @@
         const corpusInstance = document.getElementById(this.src);
 
         corpusInstance.addEventListener("select", ({detail: {corpus}}) => {
+          if(this.corpus) {
+            this.client.unwatchCorpus(this.corpus);
+          }
+
           this.client = corpusInstance.client;
+          this.corpus=corpus;
 
           this._populateLayers(corpus);
 
@@ -51,6 +56,13 @@
 
           });
         });
+
+
+        corpusInstance.addEventListener("deselect", () => {
+          this.client=null;
+          this.layers=[];
+          this.corpus=null;
+        })
 
       }
 
