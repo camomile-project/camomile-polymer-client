@@ -29,6 +29,7 @@
 
         const loginInstance = document.getElementById(this.src);
         loginInstance.addEventListener("login", () => this.client = loginInstance.client);
+        loginInstance.addEventListener("logout", () => this.client = null);
       }
 
       create(e) {

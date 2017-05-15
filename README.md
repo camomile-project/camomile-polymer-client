@@ -1,5 +1,10 @@
 # camomile-polymer-client
 
+## Demo
+
+You can try it on the github pages demo at [https://rom1504.github.io/camomile-polymer-client/](https://rom1504.github.io/camomile-polymer-client/)
+using `https://camomile.rom1504.fr` as the endpoint, `root` as user and `test` as password
+
 ## Specifications
 
 ![specifications](specifications.jpg)
