@@ -39,6 +39,7 @@
         corpusInstance.addEventListener("select", ({detail: {corpus}}) => {
           if(this.corpus) {
             this.client.unwatchCorpus(this.corpus);
+            this.dispatchEvent(new CustomEvent('deselect', {}));
           }
 
           this.client = corpusInstance.client;
@@ -62,6 +63,9 @@
           this.client=null;
           this.layers=[];
           this.corpus=null;
+
+
+          this.dispatchEvent(new CustomEvent('deselect', {}));
         })
 
       }

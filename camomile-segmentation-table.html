@@ -33,6 +33,11 @@
         const layerInstance = document.getElementById(this.srcLayer);
 
         layerInstance.addEventListener("select", ({detail: {layer}}) => {
+          if(this.layer) {
+            this.client.unwatchLayer(this.layer);
+          }
+
+
           this.client = layerInstance.client;
 
           this.layer=layer;
@@ -50,6 +55,13 @@
           });
         });
 
+        layerInstance.addEventListener("deselect", () => {
+          this.client= null;
+          this.layer=null;
+          this.annotations=null;
+        });
+
+
 
         const mediumInstance = document.getElementById(this.srcMedium);
 
@@ -61,10 +73,16 @@
             this._populateAnnotations(this.layer,this.medium);
         });
 
+
+        mediumInstance.addEventListener("deselect", () => {
+          this.client= null;
+          this.medium=null;
+          this.annotations=null;
+        });
+
       }
 
       _populateAnnotations(layer,medium) {
-        console.log("plop",layer,medium);
         this.client.getAnnotations({filter:{id_layer:layer,id_medium:medium}})
           .then(data => {
             console.log(data);

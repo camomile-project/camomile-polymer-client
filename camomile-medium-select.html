@@ -39,6 +39,7 @@
         corpusInstance.addEventListener("select", ({detail: {corpus}}) => {
           if(this.corpus) {
             this.client.unwatchCorpus(this.corpus);
+            this.dispatchEvent(new CustomEvent('deselect', {}));
           }
 
           this.corpus=corpus;
