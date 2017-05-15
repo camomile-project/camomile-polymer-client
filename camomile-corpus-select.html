@@ -47,6 +47,13 @@
             });
         });
 
+        loginInstance.addEventListener("logout", () => {
+          this.client=null;
+          this.corpora=[];
+
+          this.dispatchEvent(new CustomEvent('deselect', {}));
+        });
+
       }
 
       select(e) {
