@@ -61,6 +61,8 @@
           this.client=null;
           this.media=[];
           this.corpus=null;
+
+          this.dispatchEvent(new CustomEvent('deselect', {}));
         })
 
       }

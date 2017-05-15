@@ -25,8 +25,11 @@
         const mediumInstance = document.getElementById(this.src);
 
         mediumInstance.addEventListener("select", ({detail: {medium}}) => {
-
           this.medium_url = mediumInstance.client.getMediumURL(medium, 'mp4');
+        });
+
+        mediumInstance.addEventListener("deselect", () => {
+          this.medium_url="";
         });
       }
 
