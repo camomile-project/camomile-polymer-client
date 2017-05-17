@@ -35,14 +35,18 @@
         });
 
 
+
+
         const container = this.$.visualization;
         const options = {
           start: 0,
           end: 10000,
           height: '300px',
           multiselect: true,
+          showCurrentTime:false,
           editable: true,
-          showCurrentTime: true,
+          //showCurrentTime: true,
+          //rollingMode: true,
           onAdd: (item, callback) => {
             this.$.edit.style="display: block";
             this.$.label.focus();
@@ -63,7 +67,6 @@
             };
           },
 
-          // doesn't work yet : needs clicking
           onUpdate: (item, callback) => {
             this.$.edit.style="display: block";
             this.$.label.focus();
@@ -81,6 +84,31 @@
         };
 
         this.timeline = new vis.Timeline(container, this.items, options);
+        this.timeline.addCustomTime(0,1);
+
+        const playerInstance = document.getElementById(this.linkedPlayer);
+
+        this.editingTime=false;
+        playerInstance.video.addEventListener("timeupdate",() => {
+          if(this.editingTime)
+            return;
+          this.timeline.setCustomTime(playerInstance.video.currentTime,1);
+          this.timeline.moveTo(playerInstance.video.currentTime);
+        });
+
+        this.timeline.on("timechange",() => {
+          this.editingTime=true;
+        });
+
+        this.timeline.on("timechanged", () => {
+          playerInstance.video.currentTime=this.timeline.getCustomTime(1);
+          this.editingTime=false;
+        });
+
+        this.timeline.on("click", (e) => {
+          this.timeline.setSelection(e.item);
+        });
+
       }
 
       ready() {
@@ -161,7 +189,7 @@
 
             this.items.clear();
             this.items.add(data.map(CamomileSegmentation._transformItem));
-            this.timeline.setWindow(data[0].fragment.start,data[0].fragment.start+100,{animation:false});
+            this.timeline.setWindow(data[0].fragment.start,data[0].fragment.start+200,{animation:false});
 
 
             this.items.on('*', (event, properties) => {
@@ -176,10 +204,12 @@
               if(senderId===17)
                 return;
               properties.items.forEach(annotation => {
+                const item=this.items.get(annotation);
                 this.client.updateAnnotation(annotation,{
-                fragment:{
-                  start:this.items.get(annotation).start,
-                  end:this.items.get(annotation).end,
+                  data:item.content,
+                  fragment:{
+                    start:item.start,
+                    end:item.end,
                 }});
 
               });
@@ -193,6 +223,7 @@
         return {
           srcLayer: String,
           srcMedium: String,
+          linkedPlayer: String,
           id: String
         };
       }

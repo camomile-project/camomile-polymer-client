@@ -19,6 +19,6 @@
   "homepage": "https://github.com/rom1504/camomile-polymer-client#readme",
   "dependencies": {
     "camomile-client": "rom1504/camomile-client-javascript#patch-1",
-    "vis": "^4.19.1"
+    "vis": "rom1504/vis#fork"
   }
 }
