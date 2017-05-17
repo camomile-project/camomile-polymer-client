@@ -3,7 +3,9 @@
 <dom-module id="camomile-player">
 
   <template>
-    <p>{{medium_url}}</p>
+    <video id="video" width="640" height="480" controls>
+      <source src="{{medium_url}}" type="video/webm">
+    </video>
   </template>
 
   <script>
@@ -25,8 +27,14 @@
         const mediumInstance = document.getElementById(this.src);
 
         mediumInstance.addEventListener("select", ({detail: {medium}}) => {
+          this.medium_url = mediumInstance.client.getMediumURL(medium, 'webm');
+          this.$.video.load();
+        });
+        this.video=this.$.video;
 
-          this.medium_url = mediumInstance.client.getMediumURL(medium, 'mp4');
+        mediumInstance.addEventListener("deselect", () => {
+          this.medium_url="";
+          this.$.video.load();
         });
       }
 
