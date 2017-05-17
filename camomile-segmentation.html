@@ -214,7 +214,7 @@
 
       _setupTimeline(data) {
         this.items.add(data.map(CamomileSegmentation._transformItem));
-        this.timeline.setWindow(data[0].fragment.start,data[0].fragment.start+100,{animation:false});
+        this.timeline.setWindow(data[0].fragment.start,data[0].fragment.start+200,{animation:false});
 
 
         this._printer=(event, properties) => {
@@ -234,10 +234,12 @@
           if(senderId===17)
             return;
           properties.items.forEach(annotation => {
+            const item=this.items.get(annotation);
             this.client.updateAnnotation(annotation,{
+              data:item.content,
               fragment:{
-                start:this.items.get(annotation).start,
-                end:this.items.get(annotation).end,
+                start:item.start,
+                end:item.end,
               }});
 
           });
@@ -249,34 +251,6 @@
         this.client.getAnnotations({filter:{id_layer:layer,id_medium:medium}})
           .then(data => {
             console.log(data);
-
-            this.items.clear();
-            this.items.add(data.map(CamomileSegmentation._transformItem));
-            this.timeline.setWindow(data[0].fragment.start,data[0].fragment.start+200,{animation:false});
-
-
-            this.items.on('*', (event, properties) => {
-              console.log(event, properties.items);
-            });
-            this.items.on('remove', (event, properties,senderId) => {
-              if(senderId===17)
-                return;
-              properties.items.forEach(annotation => this.client.deleteAnnotation(annotation));
-            });
-            this.items.on('update', (event, properties,senderId) => {
-              if(senderId===17)
-                return;
-              properties.items.forEach(annotation => {
-                const item=this.items.get(annotation);
-                this.client.updateAnnotation(annotation,{
-                  data:item.content,
-                  fragment:{
-                    start:item.start,
-                    end:item.end,
-                }});
-
-              });
-            });
 
             this._clearTimeline();
             this._setupTimeline(data);
