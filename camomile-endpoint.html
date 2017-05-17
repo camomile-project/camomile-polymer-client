@@ -81,6 +81,8 @@
         this.url=null;
         this.endPointSet=false;
         setCookie("endpoint","",0);
+
+        this.dispatchEvent(new CustomEvent('endpointReset', {}));
       }
 
       static get properties() {

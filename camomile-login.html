@@ -41,6 +41,13 @@
 
         const camomileInstance=document.getElementById(this.src);
         const url=camomileInstance.url;
+
+        camomileInstance.addEventListener("endpointReset",() => {
+          if(this.logged_in)
+            this.logout();
+        });
+
+
         console.log("camomile url : " + url);
         this.client = new Camomile(url);
         this.authenticate();
@@ -78,9 +85,10 @@
       }
 
       logout(e) {
-        e.preventDefault();
+        if(e) e.preventDefault();
         this.client.logout().then(() => {
           this.logged_in=false;
+          return this.dispatchEvent(new CustomEvent('logout', {}));
         })
       }
 

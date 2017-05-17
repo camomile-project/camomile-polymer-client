@@ -121,6 +121,10 @@
         const layerInstance = document.getElementById(this.srcLayer);
 
         layerInstance.addEventListener("select", ({detail: {layer}}) => {
+          if(this.layer) {
+            this.client.unwatchLayer(this.layer);
+          }
+
           this.client = layerInstance.client;
 
           this.layer=layer;
@@ -128,6 +132,7 @@
             this._populateAnnotations(this.layer,this.medium);
 
           this.client.watchLayer(layer, (data) => {
+
             console.log(data);
             const d=JSON.parse(data.data);
             console.log(d);
@@ -158,6 +163,14 @@
         });
 
 
+        layerInstance.addEventListener("deselect", () => {
+          this.client= null;
+          this.layer=null;
+          this.annotations=null;
+          this._clearTimeline();
+        });
+
+
         const mediumInstance = document.getElementById(this.srcMedium);
 
         mediumInstance.addEventListener("select", ({detail: {medium}}) => {
@@ -167,6 +180,16 @@
           if(this.layer)
             this._populateAnnotations(this.layer,this.medium);
         });
+
+
+
+        mediumInstance.addEventListener("deselect", () => {
+          this.client= null;
+          this.medium=null;
+          this.annotations=null;
+          this._clearTimeline();
+        });
+
 
         this._loadVis();
 
@@ -180,6 +203,46 @@
           end,
           content: data
         }
+      }
+
+      _clearTimeline() {
+        this.items.off('*',this._printer);
+        this.items.off('remove',this._remover);
+        this.items.off('update',this._updater);
+        this.items.clear();
+      }
+
+      _setupTimeline(data) {
+        this.items.add(data.map(CamomileSegmentation._transformItem));
+        this.timeline.setWindow(data[0].fragment.start,data[0].fragment.start+100,{animation:false});
+
+
+        this._printer=(event, properties) => {
+          console.log(event, properties.items);
+        };
+        this.items.on('*', this._printer);
+
+        this._remover=(event, properties,senderId) => {
+          if(senderId===17)
+            return;
+          properties.items.forEach(annotation => this.client.deleteAnnotation(annotation));
+        };
+
+        this.items.on('remove', this._remover);
+
+        this._updater=(event, properties,senderId) => {
+          if(senderId===17)
+            return;
+          properties.items.forEach(annotation => {
+            this.client.updateAnnotation(annotation,{
+              fragment:{
+                start:this.items.get(annotation).start,
+                end:this.items.get(annotation).end,
+              }});
+
+          });
+        };
+        this.items.on('update', this._updater);
       }
 
       _populateAnnotations(layer,medium) {
@@ -214,6 +277,10 @@
 
               });
             });
+
+            this._clearTimeline();
+            this._setupTimeline(data);
+
           })
           .catch(err => {
           });
