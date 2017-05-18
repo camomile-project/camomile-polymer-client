@@ -31,3 +31,7 @@ Install polymer https://www.polymer-project.org/2.0/start/install-2-0 :
 * npm install
 * polymer serve
 
+## Deploy to github pages
+
+* npm run gh-publish
+
