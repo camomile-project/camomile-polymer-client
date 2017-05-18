@@ -1,0 +1,227 @@
+<link rel="import" href="bower_components/polymer/polymer-element.html">
+<script src="node_modules/d3/build/d3.min.js"></script>
+
+<dom-module id="camomile-speaker-pie">
+
+  <template>
+    <style>
+      :host {
+        width:100%;
+      }
+      text {
+        fill: black;
+      }
+      .arc path {
+        stroke: #fff;
+      }
+      .toolTip {
+        position: absolute;
+        display: none;
+        width: auto;
+        height: auto;
+        background: none repeat scroll 0 0 white;
+        border: 0 none;
+        border-radius: 8px 8px 8px 8px;
+        box-shadow: -3px 3px 15px #888888;
+        color: black;
+        font: 12px sans-serif;
+        padding: 5px;
+        text-align: center;
+      }
+    </style>
+    <div>
+
+      <div id="tooltip" class="toolTip"></div>
+      <svg  style="float:left;" id="svg"></svg>
+      <table style="float:left;">
+        <template is="dom-repeat" items="{{legendData}}">
+          <tr>
+            <td style="height:0.2in;width:0.2in;background-color:{{item.color}};"></td>
+            <td>{{item.label}}</td>
+            <td>{{item.value}}</td>
+            <td>{{item.ratio}}</td>
+          </tr>
+        </template>
+      </table>
+    </div>
+    <div style="clear: both;"></div>
+  </template>
+
+  <script>
+    class CamomileSpeakerPie extends Polymer.Element {
+      static get is() {
+        return "camomile-speaker-pie";
+      }
+
+      constructor() {
+        super();
+        this.firstTime=true;
+      }
+
+      createElements() {
+        const width = 500;
+        const height = 500;
+        this.radius=Math.min(width, height) / 2;
+
+        this.color = d3.scaleOrdinal(d3.schemeCategory20);
+
+        this.arc = d3.arc()
+          .outerRadius(this.radius)
+          .innerRadius(0);
+
+
+        this.pie = d3.pie()
+          .value((d) => d.amount);
+
+        this.svg = d3.select(this.$.svg)
+          .attr("width", width)
+          .attr("height", height)
+          .append("g")
+          .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+        this.div = d3.select(this.$.tooltip);
+      }
+
+      drawChart() {
+        this.g = this.svg.selectAll(".arc")
+          .data(this.pie(this.data))
+          .enter().append("g")
+          .attr("class", "arc");
+
+        this.g.append("path")
+          .attr("d", this.arc)
+          .style("fill", (d) => this.color(d.data.type))
+          .on("mousemove", (d) => {
+            this.div.style("left", d3.event.pageX+10+"px");
+            this.div.style("top", d3.event.pageY-25+"px");
+            this.div.style("display", "inline-block");
+            this.div.html((d.data.type)+"<br>"+(Math.round(d.data.amount,1))+"s"+"<br>"+(Math.round(d.data.amount/this.s*100))+"%");
+          })
+          .on("mouseout", (d) => {
+            this.div.style("display", "none");
+          });
+
+
+      }
+      refreshChart() {
+        this.g.data(this.pie(this.data))
+          .select("path").attr("d", this.arc);
+
+        this.g.transition()
+          .duration(1000)
+          .select("path")
+          .attr('d', this.arc)
+          .style('fill', (d) => this.color(d.data.type));
+      }
+
+      ready() {
+        super.ready();
+        console.log("id: " + this.id);
+
+        console.log("srcLayer: " + this.srcLayer);
+        console.log("srcMedium: " + this.srcMedium);
+
+
+        this.createElements();
+
+        const layerInstance = document.getElementById(this.srcLayer);
+
+        layerInstance.addEventListener("select", ({detail: {layer}}) => {
+          if(this.layer) {
+            this.client.unwatchLayer(this.layer);
+          }
+
+
+          this.client = layerInstance.client;
+
+          this.layer=layer;
+          if(this.medium)
+            this._populateAnnotations(this.layer,this.medium);
+
+          this.client.watchLayer(layer, (data) => {
+            console.log(data);
+            const d=JSON.parse(data.data);
+            console.log(d);
+
+            // add medium specified or just refresh the whole media
+            this._populateAnnotations(this.layer,this.medium);
+
+          });
+        });
+
+        layerInstance.addEventListener("deselect", () => {
+          this.client= null;
+          this.layer=null;
+          this.data=[];
+          this.legendData=[];
+          this.g.remove();
+          this.firstTime=true;
+        });
+
+
+
+        const mediumInstance = document.getElementById(this.srcMedium);
+
+        mediumInstance.addEventListener("select", ({detail: {medium}}) => {
+          this.client = mediumInstance.client;
+          this.medium=medium;
+
+          if(this.layer)
+            this._populateAnnotations(this.layer,this.medium);
+        });
+
+
+        mediumInstance.addEventListener("deselect", () => {
+          this.client= null;
+          this.medium=null;
+          this.data=[];
+          this.legendData=[];
+          this.g.remove();
+          this.firstTime=true;
+        });
+
+      }
+
+      _populateAnnotations(layer,medium) {
+        this.client.getAnnotations({filter:{id_layer:layer,id_medium:medium}})
+          .then(data => {
+            console.log(data);
+            this.m=data.reduce((acc,e) => {
+              const length=e.fragment.end-e.fragment.start;
+              acc[e.data]=acc[e.data] ? acc[e.data]+length : length;
+              return acc;
+            },{});
+            this.s=Object.keys(this.m).reduce((s,e) => s+this.m[e],0);
+            this.data=Object.keys(this.m).map((l,i) => ({id:i,type:l,amount:this.m[l]}));
+
+            this.legendData=this.data.sort((a,b) => a.amount-b.amount).reverse().map(({type,amount}) => ({
+              color:this.color(type),
+              label:type,
+              value:Math.round(amount,1)+"s",
+              ratio:Math.round(amount/this.s*100)+"%"
+            }));
+            if(this.firstTime) {
+              this.drawChart();
+              this.firstTime=false;
+            }
+            else {
+              this.refreshChart();
+            }
+          })
+          .catch(err => {
+            console.log(err);
+          });
+      }
+
+      static get properties() {
+        return {
+          srcLayer: String,
+          srcMedium: String,
+          id: String
+        };
+      }
+    }
+    customElements.define(CamomileSpeakerPie.is, CamomileSpeakerPie);
+  </script>
+
+</dom-module>
