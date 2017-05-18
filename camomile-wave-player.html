@@ -1,0 +1,59 @@
+<link rel="import" href="bower_components/polymer/polymer-element.html">
+<script src="node_modules/wavesurfer.js/dist/wavesurfer.min.js"></script>
+
+<dom-module id="camomile-wave-player">
+
+  <template>
+    <div id="waveform"></div>
+  </template>
+
+  <script>
+    class CamomileWavePlayer extends Polymer.Element {
+      static get is() {
+        return "camomile-wave-player";
+      }
+
+      constructor() {
+        super();
+      }
+
+      ready() {
+        super.ready();
+        console.log("id: " + this.id);
+        console.log("src: " + this.src);
+
+        const wavesurfer = WaveSurfer.create({
+          container: this.$.waveform,
+          xhrWithCredentials: true
+        });
+
+
+        const mediumInstance = document.getElementById(this.src);
+
+        mediumInstance.addEventListener("select", ({detail: {medium}}) => {
+          this.medium_url = mediumInstance.client.getMediumURL(medium, 'webm');
+          wavesurfer.load(this.medium_url);
+        });
+        this.video=this.$.video;
+
+        mediumInstance.addEventListener("deselect", () => {
+          this.medium_url="";
+          wavesurfer.load();
+        });
+      }
+
+      static get properties() {
+        return {
+          src: {
+            type: String
+          },
+          id: {
+            type: String
+          }
+        };
+      }
+    }
+    customElements.define(CamomileWavePlayer.is, CamomileWavePlayer);
+  </script>
+
+</dom-module>

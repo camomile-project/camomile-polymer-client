@@ -20,6 +20,7 @@
   "dependencies": {
     "camomile-client": "rom1504/camomile-client-javascript#patch-1",
     "d3": "^4.9.1",
-    "vis": "rom1504/vis#fork"
+    "vis": "rom1504/vis#fork",
+    "wavesurfer": "rom1504/wavesurfer.js#fork"
   }
 }
