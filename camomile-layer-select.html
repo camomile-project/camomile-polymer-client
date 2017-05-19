@@ -30,11 +30,8 @@
 
       ready() {
         super.ready();
-        console.log("id: " + this.id);
 
-        console.log("src: " + this.src);
-
-        const corpusInstance = document.getElementById(this.src);
+        const corpusInstance = document.getElementById(this.srcCorpus);
 
         corpusInstance.addEventListener("select", ({detail: {corpus}}) => {
           if(this.corpus) {
@@ -47,12 +44,7 @@
 
           this._populateLayers(corpus);
 
-          this.client.watchCorpus(corpus, (data) => {
-            console.log(data);
-            const d=JSON.parse(data.data);
-            console.log(d);
-
-            // add layer specified or just refresh the whole layers
+          this.client.watchCorpus(corpus, () => {
             this._populateLayers(corpus);
 
           });
@@ -73,7 +65,7 @@
       _populateLayers(corpus) {
         this.client.getLayers({filter: {'id_corpus': corpus}})
           .then(data => {
-            console.log(data);
+            console.log("layers",data);
             this.layers = data;
           })
           .catch(err => {
@@ -88,12 +80,8 @@
 
       static get properties() {
         return {
-          src: {
-            type: String
-          },
-          id: {
-            type: String
-          }
+          srcCorpus: String,
+          id: String
         };
       }
     }

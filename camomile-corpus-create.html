@@ -27,7 +27,7 @@
       ready() {
         super.ready();
 
-        const loginInstance = document.getElementById(this.src);
+        const loginInstance = document.getElementById(this.srcLogin);
         loginInstance.addEventListener("login", () => this.client = loginInstance.client);
         loginInstance.addEventListener("logout", () => this.client = null);
       }
@@ -41,12 +41,8 @@
 
       static get properties() {
         return {
-          src: {
-            type: String
-          },
-          id: {
-            type: String
-          }
+          srcLogin: String,
+          id: String
         };
       }
     }

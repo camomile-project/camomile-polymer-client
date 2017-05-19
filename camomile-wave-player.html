@@ -24,8 +24,6 @@
       ready() {
         super.ready();
         this.loading=false;
-        console.log("id: " + this.id);
-        console.log("src: " + this.src);
 
         const wavesurfer = WaveSurfer.create({
           container: this.$.waveform,
@@ -33,7 +31,7 @@
         });
 
 
-        const mediumView = document.getElementById(this.src);
+        const mediumView = document.getElementById(this.srcMediumView);
 
         mediumView.addEventListener("ready", () => {
           wavesurfer.load(mediumView.medium_url);
@@ -71,13 +69,9 @@
 
       static get properties() {
         return {
-          src: {
-            type: String
-          },
-          id: {
-            type: String
-          }
-        };
+          srcMediumView: String,
+          id: String
+        }
       }
     }
     customElements.define(CamomileWavePlayer.is, CamomileWavePlayer);

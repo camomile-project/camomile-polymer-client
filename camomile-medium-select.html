@@ -30,11 +30,7 @@
 
       ready() {
         super.ready();
-        console.log("id: " + this.id);
-
-        console.log("src: " + this.src);
-
-        const corpusInstance = document.getElementById(this.src);
+        const corpusInstance = document.getElementById(this.srcCorpus);
 
         corpusInstance.addEventListener("select", ({detail: {corpus}}) => {
           if(this.corpus) {
@@ -47,12 +43,7 @@
 
           this._populateMedia(corpus);
 
-          this.client.watchCorpus(corpus, (data) => {
-            console.log(data);
-            const d=JSON.parse(data.data);
-            console.log(d);
-
-            // add medium specified or just refresh the whole media
+          this.client.watchCorpus(corpus, () => {
             this._populateMedia(corpus);
 
           });
@@ -71,7 +62,7 @@
       _populateMedia(corpus) {
         this.client.getMedia({filter: {'id_corpus': corpus}})
           .then(data => {
-            console.log(data);
+            console.log("media",data);
             this.media = data;
           })
           .catch(err => {
@@ -86,12 +77,8 @@
 
       static get properties() {
         return {
-          src: {
-            type: String
-          },
-          id: {
-            type: String
-          }
+          srcCorpus: String,
+          id: String
         };
       }
     }
