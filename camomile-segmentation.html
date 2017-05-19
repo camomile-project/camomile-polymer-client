@@ -86,22 +86,24 @@
         this.timeline = new vis.Timeline(container, this.items, options);
         this.timeline.addCustomTime(0,1);
 
-        const playerInstance = document.getElementById(this.linkedPlayer);
+        const mediumView = document.getElementById(this.srcMediumView);
 
         this.editingTime=false;
-        playerInstance.video.addEventListener("timeupdate",() => {
-          if(this.editingTime)
+        mediumView.addEventListener("timeupdate",({detail:{sender}}) => {
+          if(this.editingTime || sender===this.id)
             return;
-          this.timeline.setCustomTime(playerInstance.video.currentTime,1);
-          this.timeline.moveTo(playerInstance.video.currentTime);
+          this.timeline.setCustomTime(mediumView.currentTime,1);
+          this.timeline.moveTo(mediumView.currentTime);
         });
+
 
         this.timeline.on("timechange",() => {
           this.editingTime=true;
         });
 
         this.timeline.on("timechanged", () => {
-          playerInstance.video.currentTime=this.timeline.getCustomTime(1);
+          mediumView.currentTime=this.timeline.getCustomTime(1);
+          mediumView.dispatchEvent(new CustomEvent("timeupdate",{detail:{sender:this.id}}));
           this.editingTime=false;
         });
 
@@ -116,7 +118,7 @@
         console.log("id: " + this.id);
 
         console.log("srcLayer: " + this.srcLayer);
-        console.log("srcMedium: " + this.srcMedium);
+        console.log("srcMediumView: " + this.srcMediumView);
 
         const layerInstance = document.getElementById(this.srcLayer);
 
@@ -171,11 +173,11 @@
         });
 
 
-        const mediumInstance = document.getElementById(this.srcMedium);
+        const mediumViewInstance = document.getElementById(this.srcMediumView);
 
-        mediumInstance.addEventListener("select", ({detail: {medium}}) => {
-          this.client = mediumInstance.client;
-          this.medium=medium;
+        mediumViewInstance.addEventListener("ready", () => {
+          this.client = mediumViewInstance.client;
+          this.medium=mediumViewInstance.medium;
 
           if(this.layer)
             this._populateAnnotations(this.layer,this.medium);
@@ -183,7 +185,7 @@
 
 
 
-        mediumInstance.addEventListener("deselect", () => {
+        mediumViewInstance.addEventListener("reset", () => {
           this.client= null;
           this.medium=null;
           this.annotations=null;
@@ -263,8 +265,7 @@
       static get properties() {
         return {
           srcLayer: String,
-          srcMedium: String,
-          linkedPlayer: String,
+          srcMediumView: String,
           id: String
         };
       }
