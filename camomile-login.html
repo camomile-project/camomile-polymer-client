@@ -34,12 +34,10 @@
 
       ready() {
         super.ready();
-        console.log("id: " + this.id);
-        console.log("src: " + this.src);
         this.logged_in=false;
 
 
-        const camomileInstance=document.getElementById(this.src);
+        const camomileInstance=document.getElementById(this.srcEndpoint);
         const url=camomileInstance.url;
 
         camomileInstance.addEventListener("endpointReset",() => {
@@ -48,7 +46,6 @@
         });
 
 
-        console.log("camomile url : " + url);
         this.client = new Camomile(url);
         this.authenticate();
       }
@@ -68,7 +65,6 @@
       login(e) {
         e.preventDefault();
         const url = document.getElementById(this.src).url;
-        console.log("camomile url : " + url);
         this.client = new Camomile(url);
 
 
@@ -94,12 +90,8 @@
 
       static get properties() {
         return {
-          src: {
-            type: String
-          },
-          id: {
-            type: String
-          }
+          srcEndpoint: String,
+          id: String
         };
       }
     }

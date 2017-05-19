@@ -45,8 +45,7 @@
           multiselect: true,
           showCurrentTime:false,
           editable: true,
-          //showCurrentTime: true,
-          //rollingMode: true,
+          showMajorLabels:false,
           onAdd: (item, callback) => {
             this.$.edit.style="display: block";
             this.$.label.focus();
@@ -111,14 +110,15 @@
           this.timeline.setSelection(e.item);
         });
 
+        this.timeline.on("rangechanged", (e) => {
+          mediumView.range={start:e.start,end:e.end};
+          mediumView.dispatchEvent(new CustomEvent("rangechanged",{detail:{sender:this.id}}));
+        })
+
       }
 
       ready() {
         super.ready();
-        console.log("id: " + this.id);
-
-        console.log("srcLayer: " + this.srcLayer);
-        console.log("srcMediumView: " + this.srcMediumView);
 
         const layerInstance = document.getElementById(this.srcLayer);
 
@@ -135,9 +135,8 @@
 
           this.client.watchLayer(layer, (data) => {
 
-            console.log(data);
             const d=JSON.parse(data.data);
-            console.log(d);
+            console.log("watchLayer",d);
 
             if(d.event['update_annotation']) {
               this.client.getAnnotation(d.event['update_annotation'])
@@ -220,7 +219,7 @@
 
 
         this._printer=(event, properties) => {
-          console.log(event, properties.items);
+          console.log("timeline event",event, properties.items);
         };
         this.items.on('*', this._printer);
 
@@ -252,7 +251,7 @@
       _populateAnnotations(layer,medium) {
         this.client.getAnnotations({filter:{id_layer:layer,id_medium:medium}})
           .then(data => {
-            console.log(data);
+            console.log("annotations",data);
 
             this._clearTimeline();
             this._setupTimeline(data);

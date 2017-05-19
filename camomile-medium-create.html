@@ -28,7 +28,7 @@
       ready() {
         super.ready();
 
-        const corpusInstance = document.getElementById(this.src);
+        const corpusInstance = document.getElementById(this.srcCorpus);
         corpusInstance.addEventListener("select", ({detail: {corpus}}) => {
           this.client = corpusInstance.client;
           this.corpus = corpus;
@@ -51,12 +51,8 @@
 
       static get properties() {
         return {
-          src: {
-            type: String
-          },
-          id: {
-            type: String
-          }
+          srcCorpus: String,
+          id: String
         };
       }
     }

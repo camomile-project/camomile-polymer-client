@@ -19,13 +19,12 @@
       constructor() {
         super();
         this.loading=false;
+        this.loaded=false;
       }
 
       ready() {
         super.ready();
         this.loading=false;
-        console.log("id: " + this.id);
-        console.log("src: " + this.src);
 
         const wavesurfer = WaveSurfer.create({
           container: this.$.waveform,
@@ -33,13 +32,14 @@
         });
 
 
-        const mediumView = document.getElementById(this.src);
+        const mediumView = document.getElementById(this.srcMediumView);
 
         mediumView.addEventListener("ready", () => {
           wavesurfer.load(mediumView.medium_url);
           this.loading=true;
           wavesurfer.on("ready",() => {
             this.loading=false;
+            this.loaded=true;
           });
           wavesurfer.on("loading",(loadingProgress) => {
             this.loadingProgress=loadingProgress;
@@ -49,6 +49,7 @@
         mediumView.addEventListener("reset", () => {
           wavesurfer.load();
           this.loading=false;
+          this.loaded=false;
         });
 
         this.beingSought=false;
@@ -67,17 +68,21 @@
           wavesurfer.seekAndCenter(mediumView.currentTime/wavesurfer.getDuration());
           this.beingSought=false;
         });
+
+
+        mediumView.addEventListener("rangechanged",({detail:{sender}}) => {
+          if (sender === this.id || !this.loaded)
+            return;
+
+          wavesurfer.zoom(this.$.waveform.clientWidth/(mediumView.range.end-mediumView.range.start));
+        });
       }
 
       static get properties() {
         return {
-          src: {
-            type: String
-          },
-          id: {
-            type: String
-          }
-        };
+          srcMediumView: String,
+          id: String
+        }
       }
     }
     customElements.define(CamomileWavePlayer.is, CamomileWavePlayer);

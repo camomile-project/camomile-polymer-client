@@ -30,17 +30,13 @@
 
       ready() {
         super.ready();
-        console.log("id: " + this.id);
-
-        console.log("src: " + this.src);
-
-        const loginInstance = document.getElementById(this.src);
+        const loginInstance = document.getElementById(this.srcLogin);
 
         loginInstance.addEventListener("login", () => {
           this.client = loginInstance.client;
           this.client.getCorpora()
             .then(data => {
-              console.log(data);
+              console.log("corpora",data);
               this.corpora = data;
             })
             .catch(err => {
@@ -65,12 +61,8 @@
 
       static get properties() {
         return {
-          src: {
-            type: String
-          },
-          id: {
-            type: String
-          }
+          srcLogin: String,
+          id: String
         };
       }
     }

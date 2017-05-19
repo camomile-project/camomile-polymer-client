@@ -116,10 +116,6 @@
 
       ready() {
         super.ready();
-        console.log("id: " + this.id);
-
-        console.log("srcLayer: " + this.srcLayer);
-        console.log("srcMedium: " + this.srcMedium);
 
 
         this.createElements();
@@ -138,12 +134,7 @@
           if(this.medium)
             this._populateAnnotations(this.layer,this.medium);
 
-          this.client.watchLayer(layer, (data) => {
-            console.log(data);
-            const d=JSON.parse(data.data);
-            console.log(d);
-
-            // add medium specified or just refresh the whole media
+          this.client.watchLayer(layer, () => {
             this._populateAnnotations(this.layer,this.medium);
 
           });
@@ -185,7 +176,7 @@
       _populateAnnotations(layer,medium) {
         this.client.getAnnotations({filter:{id_layer:layer,id_medium:medium}})
           .then(data => {
-            console.log(data);
+            console.log("annotations",data);
             this.m=data.reduce((acc,e) => {
               const length=e.fragment.end-e.fragment.start;
               acc[e.data]=acc[e.data] ? acc[e.data]+length : length;

@@ -20,11 +20,8 @@
 
       ready() {
         super.ready();
-        console.log("id: " + this.id);
-        console.log("src: " + this.src);
 
-
-        const mediumView = document.getElementById(this.src);
+        const mediumView = document.getElementById(this.srcMediumView);
 
         mediumView.addEventListener("ready", () => {
           this.medium_url = mediumView.medium_url;
@@ -54,7 +51,7 @@
 
       static get properties() {
         return {
-          src: String,
+          srcMediumView: String,
           id: String
         }
       }

@@ -17,11 +17,8 @@
 
       ready() {
         super.ready();
-        console.log("id: " + this.id);
-        console.log("src: " + this.src);
 
-
-        const mediumInstance = document.getElementById(this.src);
+        const mediumInstance = document.getElementById(this.srcMedium);
 
         mediumInstance.addEventListener("select", ({detail: {medium}}) => {
           this.medium=medium;
@@ -40,7 +37,7 @@
 
       static get properties() {
         return {
-          src: String,
+          srcMedium: String,
           id: String
         };
       }

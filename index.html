@@ -23,25 +23,25 @@
   <body>
     <camomile-endpoint id="camomile1"></camomile-endpoint>
     <div>
-      <camomile-login src="camomile1" id="user1"></camomile-login>
+      <camomile-login id="user1" src-endpoint="camomile1"></camomile-login>
     </div>
     <div>
-      <camomile-corpus-select src="user1" id="corpus1"></camomile-corpus-select>
-      <camomile-medium-select src="corpus1" id="medium1"></camomile-medium-select>
-      <camomile-corpus-create id="createCorpus1" src="user1"></camomile-corpus-create>
+      <camomile-corpus-select id="corpus1" src-login="user1"></camomile-corpus-select>
+      <camomile-medium-select id="medium1" src-corpus="corpus1"></camomile-medium-select>
+      <camomile-corpus-create id="createCorpus1" src-login="user1"></camomile-corpus-create>
       <br />
-      <camomile-medium-create id="createMedium1" src="corpus1"></camomile-medium-create>
+      <camomile-medium-create id="createMedium1" src-corpus="corpus1"></camomile-medium-create>
       <br />
-      <camomile-layer-create id="createLayer" src="corpus1"></camomile-layer-create>
+      <camomile-layer-create id="createLayer" src-corpus="corpus1"></camomile-layer-create>
 
       <br />
-      <camomile-layer-select id="layer1" src="corpus1"></camomile-layer-select>
-      <camomile-player id="player1" src="mediumView1"></camomile-player>
-      <camomile-wave-player id="wave-player1" src="mediumView1"></camomile-wave-player>
+      <camomile-layer-select id="layer1" src-corpus="corpus1"></camomile-layer-select>
+      <camomile-player id="player1" src-medium-view="mediumView1"></camomile-player>
+      <camomile-wave-player id="wave-player1" src-medium-view="mediumView1"></camomile-wave-player>
 
       <br />
 
-      <camomile-medium-view id="mediumView1" src="medium1"></camomile-medium-view>
+      <camomile-medium-view id="mediumView1" src-medium="medium1"></camomile-medium-view>
       <camomile-segmentation id="segmentation1" src-layer="layer1" src-medium-view="mediumView1"></camomile-segmentation>
       <camomile-speaker-pie id="pie1" src-layer="layer1" src-medium="medium1"></camomile-speaker-pie>
       <camomile-segmentation-table id="segmentation2" src-layer="layer1" src-medium="medium1"></camomile-segmentation-table>
