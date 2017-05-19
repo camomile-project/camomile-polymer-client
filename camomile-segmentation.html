@@ -45,8 +45,7 @@
           multiselect: true,
           showCurrentTime:false,
           editable: true,
-          //showCurrentTime: true,
-          //rollingMode: true,
+          showMajorLabels:false,
           onAdd: (item, callback) => {
             this.$.edit.style="display: block";
             this.$.label.focus();
@@ -110,6 +109,11 @@
         this.timeline.on("click", (e) => {
           this.timeline.setSelection(e.item);
         });
+
+        this.timeline.on("rangechanged", (e) => {
+          mediumView.range={start:e.start,end:e.end};
+          mediumView.dispatchEvent(new CustomEvent("rangechanged",{detail:{sender:this.id}}));
+        })
 
       }
 
