@@ -24,29 +24,39 @@
         console.log("src: " + this.src);
 
 
-        const mediumInstance = document.getElementById(this.src);
+        const mediumView = document.getElementById(this.src);
 
-        mediumInstance.addEventListener("select", ({detail: {medium}}) => {
-          this.medium_url = mediumInstance.client.getMediumURL(medium, 'webm');
+        mediumView.addEventListener("ready", () => {
+          this.medium_url = mediumView.medium_url;
           this.$.video.load();
         });
         this.video=this.$.video;
 
-        mediumInstance.addEventListener("deselect", () => {
+        mediumView.addEventListener("reset", () => {
           this.medium_url="";
           this.$.video.load();
         });
+
+        this.video.addEventListener("timeupdate",() => {
+          mediumView.currentTime=this.video.currentTime;
+          mediumView.dispatchEvent(new CustomEvent("timeupdate",{detail:{sender:this.id}}));
+        });
+
+
+        mediumView.addEventListener("timeupdate",({detail:{sender}}) => {
+          if (sender === this.id)
+            return;
+          this.video.currentTime=mediumView.currentTime;
+        });
+
+
       }
 
       static get properties() {
         return {
-          src: {
-            type: String
-          },
-          id: {
-            type: String
-          }
-        };
+          src: String,
+          id: String
+        }
       }
     }
     customElements.define(CamomilePlayer.is, CamomilePlayer);

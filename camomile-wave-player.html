@@ -4,6 +4,9 @@
 <dom-module id="camomile-wave-player">
 
   <template>
+    <template is="dom-if" if="{{loading}}">
+      <p>Loading waveform {{loadingProgress}}%...</p>
+    </template>
     <div id="waveform"></div>
   </template>
 
@@ -15,10 +18,12 @@
 
       constructor() {
         super();
+        this.loading=false;
       }
 
       ready() {
         super.ready();
+        this.loading=false;
         console.log("id: " + this.id);
         console.log("src: " + this.src);
 
@@ -28,17 +33,39 @@
         });
 
 
-        const mediumInstance = document.getElementById(this.src);
+        const mediumView = document.getElementById(this.src);
 
-        mediumInstance.addEventListener("select", ({detail: {medium}}) => {
-          this.medium_url = mediumInstance.client.getMediumURL(medium, 'webm');
-          wavesurfer.load(this.medium_url);
+        mediumView.addEventListener("ready", () => {
+          wavesurfer.load(mediumView.medium_url);
+          this.loading=true;
+          wavesurfer.on("ready",() => {
+            this.loading=false;
+          });
+          wavesurfer.on("loading",(loadingProgress) => {
+            this.loadingProgress=loadingProgress;
+          })
         });
-        this.video=this.$.video;
 
-        mediumInstance.addEventListener("deselect", () => {
-          this.medium_url="";
+        mediumView.addEventListener("reset", () => {
           wavesurfer.load();
+          this.loading=false;
+        });
+
+        this.beingSought=false;
+        wavesurfer.on("seek",() => {
+          if(this.beingSought)
+            return;
+          mediumView.currentTime=wavesurfer.getCurrentTime();
+          mediumView.dispatchEvent(new CustomEvent("timeupdate",{detail:{sender:this.id}}));
+        });
+
+
+        mediumView.addEventListener("timeupdate",({detail:{sender}}) => {
+          if (sender === this.id)
+            return;
+          this.beingSought=true;
+          wavesurfer.seekAndCenter(mediumView.currentTime/wavesurfer.getDuration());
+          this.beingSought=false;
         });
       }
 

@@ -17,6 +17,7 @@
     <link rel="import" href="camomile-segmentation-table.html">
     <link rel="import" href="camomile-speaker-pie.html">
     <link rel="import" href="camomile-wave-player.html">
+    <link rel="import" href="camomile-medium-view.html">
   </head>
 
   <body>
@@ -35,14 +36,15 @@
 
       <br />
       <camomile-layer-select id="layer1" src="corpus1"></camomile-layer-select>
-      <camomile-player id="player1" src="medium1"></camomile-player>
-      <camomile-wave-player id="wave-player1" src="medium1"></camomile-wave-player>
+      <camomile-player id="player1" src="mediumView1"></camomile-player>
+      <camomile-wave-player id="wave-player1" src="mediumView1"></camomile-wave-player>
 
       <br />
 
-      <camomile-segmentation src-layer="layer1" src-medium="medium1" linked-player="player1" id="segmentation1"></camomile-segmentation>
+      <camomile-medium-view id="mediumView1" src="medium1"></camomile-medium-view>
+      <camomile-segmentation id="segmentation1" src-layer="layer1" src-medium-view="mediumView1"></camomile-segmentation>
       <camomile-speaker-pie id="pie1" src-layer="layer1" src-medium="medium1"></camomile-speaker-pie>
-      <camomile-segmentation-table src-layer="layer1" src-medium="medium1" id="segmentation2" ></camomile-segmentation-table>
+      <camomile-segmentation-table id="segmentation2" src-layer="layer1" src-medium="medium1"></camomile-segmentation-table>
 
 
     </div>

@@ -1,0 +1,51 @@
+<link rel="import" href="bower_components/polymer/polymer-element.html">
+
+<dom-module id="camomile-medium-view">
+
+  <template>
+  </template>
+
+  <script>
+    class CamomileMediumView extends Polymer.Element {
+      static get is() {
+        return "camomile-medium-view";
+      }
+
+      constructor() {
+        super();
+      }
+
+      ready() {
+        super.ready();
+        console.log("id: " + this.id);
+        console.log("src: " + this.src);
+
+
+        const mediumInstance = document.getElementById(this.src);
+
+        mediumInstance.addEventListener("select", ({detail: {medium}}) => {
+          this.medium=medium;
+          this.client=mediumInstance.client;
+          this.medium_url = this.client.getMediumURL(medium, 'webm');
+          this.dispatchEvent(new CustomEvent('ready', {}));
+        });
+
+        mediumInstance.addEventListener("deselect", () => {
+          this.medium=null;
+          this.medium_url="";
+          this.client=null;
+          this.dispatchEvent(new CustomEvent('reset', {}));
+        });
+      }
+
+      static get properties() {
+        return {
+          src: String,
+          id: String
+        };
+      }
+    }
+    customElements.define(CamomileMediumView.is, CamomileMediumView);
+  </script>
+
+</dom-module>
