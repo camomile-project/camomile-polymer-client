@@ -1,6 +1,6 @@
 <link rel="import" href="bower_components/polymer/polymer-element.html">
 <link rel="import" href="bower_components/polymer/lib/elements/dom-repeat.html">
-
+<script src="cookie.js"></script>
 
 <dom-module id="camomile-medium-select">
 
@@ -35,17 +35,25 @@
         corpusInstance.addEventListener("select", ({detail: {corpus}}) => {
           if(this.corpus) {
             this.client.unwatchCorpus(this.corpus);
+            setCookie("medium","",0);
             this.dispatchEvent(new CustomEvent('deselect', {}));
           }
 
           this.corpus=corpus;
           this.client = corpusInstance.client;
 
-          this._populateMedia(corpus);
+          this._populateMedia(corpus).then(() => {
+            setTimeout(() => {
+              const v=getCookie("medium");
+              if(v!=="") {
+                this.$.medium.value=v;
+                return this.selectMedium(v);
+              }
+            },0);
+          });
 
           this.client.watchCorpus(corpus, () => {
             this._populateMedia(corpus);
-
           });
         });
 
@@ -53,6 +61,7 @@
           this.client=null;
           this.media=[];
           this.corpus=null;
+          setCookie("medium","",0);
 
           this.dispatchEvent(new CustomEvent('deselect', {}));
         })
@@ -60,19 +69,25 @@
       }
 
       _populateMedia(corpus) {
-        this.client.getMedia({filter: {'id_corpus': corpus}})
+        return this.client.getMedia({filter: {'id_corpus': corpus}})
           .then(data => {
             console.log("media",data);
             this.media = data;
           })
           .catch(err => {
+            console.log(err);
           });
       }
 
       select(e) {
         e.preventDefault();
-        console.log("medium", this.$.medium.value);
-        this.dispatchEvent(new CustomEvent('select', {detail: {medium: this.$.medium.value}}));
+        setCookie("medium",this.$.medium.value,10);
+        this.selectMedium(this.$.medium.value);
+      }
+
+      selectMedium(medium) {
+        console.log("medium", medium);
+        this.dispatchEvent(new CustomEvent('select', {detail: {medium}}));
       }
 
       static get properties() {

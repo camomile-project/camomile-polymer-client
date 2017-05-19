@@ -1,6 +1,6 @@
 <link rel="import" href="bower_components/polymer/polymer-element.html">
 <link rel="import" href="bower_components/polymer/lib/elements/dom-repeat.html">
-
+<script src="cookie.js"></script>
 
 <dom-module id="camomile-corpus-select">
 
@@ -38,8 +38,17 @@
             .then(data => {
               console.log("corpora",data);
               this.corpora = data;
+
+              setTimeout(() => {
+                const v=getCookie("corpus");
+                if(v!=="") {
+                  this.$.corpus.value=v;
+                  return this.selectCorpus(v);
+                }
+              },0);
             })
             .catch(err => {
+              console.log(err);
             });
         });
 
@@ -47,6 +56,7 @@
           this.client=null;
           this.corpora=[];
 
+          setCookie("corpus","",0);
           this.dispatchEvent(new CustomEvent('deselect', {}));
         });
 
@@ -54,9 +64,13 @@
 
       select(e) {
         e.preventDefault();
-        console.log("corpus", this.$.corpus.value);
-        this.dispatchEvent(new CustomEvent('select', {detail: {corpus: this.$.corpus.value}}));
+        setCookie("corpus",this.$.corpus.value,10);
+        this.selectCorpus(this.$.corpus.value);
+      }
 
+      selectCorpus(corpus) {
+        console.log("corpus", corpus);
+        return this.dispatchEvent(new CustomEvent('select', {detail: {corpus: corpus}}));
       }
 
       static get properties() {

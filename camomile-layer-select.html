@@ -1,6 +1,6 @@
 <link rel="import" href="bower_components/polymer/polymer-element.html">
 <link rel="import" href="bower_components/polymer/lib/elements/dom-repeat.html">
-
+<script src="cookie.js"></script>
 
 <dom-module id="camomile-layer-select">
 
@@ -37,16 +37,24 @@
           if(this.corpus) {
             this.client.unwatchCorpus(this.corpus);
             this.dispatchEvent(new CustomEvent('deselect', {}));
+            setCookie("layer","",0);
           }
 
           this.client = corpusInstance.client;
           this.corpus=corpus;
 
-          this._populateLayers(corpus);
+          this._populateLayers(corpus).then(() => {
+            setTimeout(() => {
+              const v=getCookie("layer");
+              if(v!=="") {
+                this.$.layer.value=v;
+                return this.selectLayer(v);
+              }
+            },0);
+          });
 
           this.client.watchCorpus(corpus, () => {
             this._populateLayers(corpus);
-
           });
         });
 
@@ -55,6 +63,7 @@
           this.client=null;
           this.layers=[];
           this.corpus=null;
+          setCookie("layer","",0);
 
 
           this.dispatchEvent(new CustomEvent('deselect', {}));
@@ -63,19 +72,25 @@
       }
 
       _populateLayers(corpus) {
-        this.client.getLayers({filter: {'id_corpus': corpus}})
+        return this.client.getLayers({filter: {'id_corpus': corpus}})
           .then(data => {
             console.log("layers",data);
             this.layers = data;
           })
           .catch(err => {
+            console.log(err);
           });
       }
 
       select(e) {
         e.preventDefault();
-        console.log("layer", this.$.layer.value);
-        this.dispatchEvent(new CustomEvent('select', {detail: {layer: this.$.layer.value}}));
+        setCookie("layer",this.$.layer.value,10);
+        this.selectLayer(this.$.layer.value);
+      }
+
+      selectLayer(layer) {
+        console.log("layer", layer);
+        this.dispatchEvent(new CustomEvent('select', {detail: {layer: layer}}));
       }
 
       static get properties() {
