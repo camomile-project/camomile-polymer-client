@@ -145,7 +145,8 @@
           this.layer=null;
           this.data=[];
           this.legendData=[];
-          this.g.remove();
+          if(this.g)
+            this.g.remove();
           this.firstTime=true;
         });
 
@@ -167,7 +168,8 @@
           this.medium=null;
           this.data=[];
           this.legendData=[];
-          this.g.remove();
+          if(this.g)
+            this.g.remove();
           this.firstTime=true;
         });
 
