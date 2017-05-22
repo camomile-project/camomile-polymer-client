@@ -23,12 +23,11 @@ So defining the needed components for camomile will consist in defining the rele
 
 ## Installation
 
-Install polymer https://www.polymer-project.org/2.0/start/install-2-0 :
-
-* npm install -g bower
-* npm install -g polymer-cli@next
-* bower install Polymer/polymer#^2.0.0-rc.7
+* npm install -g polymer-cli
 * npm install
+
+## Run
+
 * polymer serve
 
 ## Deploy to github pages
