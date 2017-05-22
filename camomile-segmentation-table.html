@@ -1,5 +1,5 @@
-<link rel="import" href="bower_components/polymer/polymer-element.html">
-<link rel="import" href="bower_components/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="node_modules/@polymer/polymer/polymer-element.html">
+<link rel="import" href="node_modules/@polymer/polymer/lib/elements/dom-repeat.html">
 
 
 <dom-module id="camomile-segmentation-table">
@@ -28,49 +28,53 @@
 
         const layerInstance = document.getElementById(this.srcLayer);
 
-        layerInstance.addEventListener("select", ({detail: {layer}}) => {
-          if(this.layer) {
-            this.client.unwatchLayer(this.layer);
-          }
-
-
-          this.client = layerInstance.client;
-
-          this.layer=layer;
-          if(this.medium)
-            this._populateAnnotations(this.layer,this.medium);
-
-          this.client.watchLayer(layer, () => {
-            this._populateAnnotations(this.layer,this.medium);
-
-          });
-        });
-
-        layerInstance.addEventListener("deselect", () => {
-          this.client= null;
-          this.layer=null;
-          this.annotations=null;
-        });
-
-
+        if(layerInstance.layer)
+          this._setupLayer(layerInstance);
+        layerInstance.addEventListener("select", () => this._setupLayer(layerInstance));
+        layerInstance.addEventListener("deselect", () => this._resetLayer());
 
         const mediumInstance = document.getElementById(this.srcMedium);
+        if(mediumInstance.medium)
+          this._setupMedium(mediumInstance);
+        mediumInstance.addEventListener("select", () => this._setupMedium(mediumInstance));
+        mediumInstance.addEventListener("deselect", () => this._resetMedium());
 
-        mediumInstance.addEventListener("select", ({detail: {medium}}) => {
-          this.client = mediumInstance.client;
-          this.medium=medium;
+      }
 
-          if(this.layer)
-            this._populateAnnotations(this.layer,this.medium);
+      _setupLayer(layerInstance) {
+        if(this.layer) {
+          this.client.unwatchLayer(this.layer);
+        }
+
+        this.client = layerInstance.client;
+        this.layer=layerInstance.layer;
+        if(this.medium)
+          this._populateAnnotations(this.layer,this.medium);
+
+        console.log("segmentation table watch layer",layerInstance.layer);
+        this.client.watchLayer(layerInstance.layer, () => {
+          this._populateAnnotations(this.layer,this.medium);
         });
+      }
 
+      _resetLayer() {
+        this.client= null;
+        this.layer=null;
+        this.annotations=null;
+      }
 
-        mediumInstance.addEventListener("deselect", () => {
-          this.client= null;
-          this.medium=null;
-          this.annotations=null;
-        });
+      _setupMedium(mediumInstance) {
+        this.client = mediumInstance.client;
+        this.medium=mediumInstance.medium;
 
+        if(this.layer)
+          this._populateAnnotations(this.layer,this.medium);
+      }
+
+      _resetMedium() {
+        this.client= null;
+        this.medium=null;
+        this.annotations=null;
       }
 
       _populateAnnotations(layer,medium) {

@@ -1,4 +1,4 @@
-<link rel="import" href="bower_components/polymer/polymer-element.html">
+<link rel="import" href="node_modules/@polymer/polymer/polymer-element.html">
 
 <dom-module id="camomile-player">
 
@@ -18,21 +18,29 @@
         super();
       }
 
+      _setupMediumView(mediumView) {
+        console.log("setting player",this.id,"to",mediumView.medium_url);
+        this.medium_url = mediumView.medium_url;
+        this.$.video.load();
+      }
+
+      _resetMediumView() {
+        console.log("reset player",this.id);
+        this.medium_url="";
+        this.$.video.load();
+      }
+
       ready() {
         super.ready();
 
         const mediumView = document.getElementById(this.srcMediumView);
 
-        mediumView.addEventListener("ready", () => {
-          this.medium_url = mediumView.medium_url;
-          this.$.video.load();
-        });
+        if(mediumView.medium)
+          this._setupMediumView(mediumView);
+        mediumView.addEventListener("ready",() => this._setupMediumView(mediumView));
         this.video=this.$.video;
 
-        mediumView.addEventListener("reset", () => {
-          this.medium_url="";
-          this.$.video.load();
-        });
+        mediumView.addEventListener("reset", () => this._resetMediumView());
 
         this.video.addEventListener("timeupdate",() => {
           mediumView.currentTime=this.video.currentTime;

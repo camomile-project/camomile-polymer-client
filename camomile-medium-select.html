@@ -1,5 +1,5 @@
-<link rel="import" href="bower_components/polymer/polymer-element.html">
-<link rel="import" href="bower_components/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="node_modules/@polymer/polymer/polymer-element.html">
+<link rel="import" href="node_modules/@polymer/polymer/lib/elements/dom-repeat.html">
 <script src="cookie.js"></script>
 
 <dom-module id="camomile-medium-select">
@@ -32,40 +32,47 @@
         super.ready();
         const corpusInstance = document.getElementById(this.srcCorpus);
 
-        corpusInstance.addEventListener("select", ({detail: {corpus}}) => {
-          if(this.corpus) {
-            this.client.unwatchCorpus(this.corpus);
-            setCookie("medium","",0);
-            this.dispatchEvent(new CustomEvent('deselect', {}));
-          }
 
-          this.corpus=corpus;
-          this.client = corpusInstance.client;
+        if(corpusInstance.corpus)
+          this._setupCorpus(corpusInstance);
+        corpusInstance.addEventListener("select", () => this._setupCorpus(corpusInstance));
+        corpusInstance.addEventListener("deselect", () => this._resetCorpus())
 
-          this._populateMedia(corpus).then(() => {
-            setTimeout(() => {
-              const v=getCookie("medium");
-              if(v!=="") {
-                this.$.medium.value=v;
-                return this.selectMedium(v);
-              }
-            },0);
-          });
+      }
 
-          this.client.watchCorpus(corpus, () => {
-            this._populateMedia(corpus);
-          });
+      _setupCorpus(corpusInstance) {
+        if(this.corpus) {
+          this.client.unwatchCorpus(this.corpus);
+          setCookie("medium","",0);
+          this.dispatchEvent(new CustomEvent('deselect', {}));
+        }
+
+        this.corpus=corpusInstance.corpus;
+        this.client = corpusInstance.client;
+
+        this._populateMedia(corpusInstance.corpus).then(() => {
+          setTimeout(() => {
+            const v=getCookie("medium");
+            if(v!=="") {
+              this.$.medium.value=v;
+              return this.selectMedium(v);
+            }
+          },0);
         });
 
-        corpusInstance.addEventListener("deselect", () => {
-          this.client=null;
-          this.media=[];
-          this.corpus=null;
-          setCookie("medium","",0);
+        this.client.watchCorpus(corpusInstance.corpus, () => {
+          this._populateMedia(corpusInstance.corpus);
+        });
+      }
 
-          this.dispatchEvent(new CustomEvent('deselect', {}));
-        })
+      _resetCorpus() {
+        this.client=null;
+        this.media=[];
+        this.corpus=null;
+        this.medium=null;
+        setCookie("medium","",0);
 
+        this.dispatchEvent(new CustomEvent('deselect', {}));
       }
 
       _populateMedia(corpus) {
@@ -87,7 +94,8 @@
 
       selectMedium(medium) {
         console.log("medium", medium);
-        this.dispatchEvent(new CustomEvent('select', {detail: {medium}}));
+        this.medium=medium;
+        this.dispatchEvent(new CustomEvent('select', {}));
       }
 
       static get properties() {

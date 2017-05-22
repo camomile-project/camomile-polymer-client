@@ -1,4 +1,4 @@
-<link rel="import" href="bower_components/polymer/polymer-element.html">
+<link rel="import" href="node_modules/@polymer/polymer/polymer-element.html">
 
 <dom-module id="camomile-corpus-create">
 
@@ -24,12 +24,23 @@
         super();
       }
 
+      _setupClient(loginInstance) {
+        this.client = loginInstance.client;
+      }
+
+      _resetClient() {
+        this.client = null;
+      }
+
       ready() {
         super.ready();
 
         const loginInstance = document.getElementById(this.srcLogin);
-        loginInstance.addEventListener("login", () => this.client = loginInstance.client);
-        loginInstance.addEventListener("logout", () => this.client = null);
+
+        if(loginInstance.logged_in)
+          this._setupClient(loginInstance);
+        loginInstance.addEventListener("login",() => this._setupClient(loginInstance));
+        loginInstance.addEventListener("logout", () => this._resetClient());
       }
 
       create(e) {

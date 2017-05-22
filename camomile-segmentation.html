@@ -1,5 +1,5 @@
-<link rel="import" href="bower_components/polymer/polymer-element.html">
-<link rel="import" href="bower_components/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="node_modules/@polymer/polymer/polymer-element.html">
+<link rel="import" href="node_modules/@polymer/polymer/lib/elements/dom-repeat.html">
 
 <script src="node_modules/vis/dist/vis.js"></script>
 
@@ -19,7 +19,6 @@
   </template>
 
   <script>
-    // TODO : fix simple click
     class CamomileSegmentation extends Polymer.Element {
       static get is() {
         return "camomile-segmentation";
@@ -29,13 +28,32 @@
         super();
       }
 
+
+      ready() {
+        super.ready();
+
+        const layerInstance = document.getElementById(this.srcLayer);
+
+        if(layerInstance.layer)
+          this._setupLayer(layerInstance);
+        layerInstance.addEventListener("select", () => this._setupLayer(layerInstance));
+        layerInstance.addEventListener("deselect", () => this._resetLayer());
+
+        const mediumViewInstance = document.getElementById(this.srcMediumView);
+
+        if(mediumViewInstance.medium)
+          this._setupMediumView(mediumViewInstance);
+        mediumViewInstance.addEventListener("ready", () => this._setupMediumView(mediumViewInstance));
+        mediumViewInstance.addEventListener("reset", () => this._resetMediumView());
+
+        this._loadVis();
+
+      }
+
       _loadVis() {
         this.items = new vis.DataSet({
           type: { start: 'Number', end: 'Number' }
         });
-
-
-
 
         const container = this.$.visualization;
         const options = {
@@ -117,84 +135,70 @@
 
       }
 
-      ready() {
-        super.ready();
+      _setupLayer(layerInstance) {
+        if(this.layer) {
+          this.client.unwatchLayer(this.layer);
+        }
 
-        const layerInstance = document.getElementById(this.srcLayer);
+        this.client = layerInstance.client;
 
-        layerInstance.addEventListener("select", ({detail: {layer}}) => {
-          if(this.layer) {
-            this.client.unwatchLayer(this.layer);
+        this.layer=layerInstance.layer;
+        if(this.medium)
+          this._populateAnnotations(this.layer,this.medium);
+
+        console.log("segmentation watch layer",layerInstance.layer);
+        this.client.watchLayer(layerInstance.layer, (data) => {
+
+          const d=JSON.parse(data.data);
+          console.log("watchLayer",d);
+
+          if(d.event['update_annotation']) {
+            this.client.getAnnotation(d.event['update_annotation'])
+              .then(data => {
+                this.items.update(CamomileSegmentation._transformItem(data),17);
+              })
           }
 
-          this.client = layerInstance.client;
-
-          this.layer=layer;
-          if(this.medium)
-            this._populateAnnotations(this.layer,this.medium);
-
-          this.client.watchLayer(layer, (data) => {
-
-            const d=JSON.parse(data.data);
-            console.log("watchLayer",d);
-
-            if(d.event['update_annotation']) {
-              this.client.getAnnotation(d.event['update_annotation'])
-                .then(data => {
-                  this.items.update(CamomileSegmentation._transformItem(data),17);
-                })
-            }
-
-            if(d.event['delete_annotation']) {
-              this.items.remove(d.event['delete_annotation'],17);
-            }
+          if(d.event['delete_annotation']) {
+            this.items.remove(d.event['delete_annotation'],17);
+          }
 
 
-            if(d.event['add_annotation']) {
-              this.client.getAnnotation(d.event['add_annotation'])
-                .then(data => {
-                  if(this.items.get(d.event['add_annotation']))
-                    return;
-                  this.items.add(CamomileSegmentation._transformItem(data),17);
-                })
-            }
+          if(d.event['add_annotation']) {
+            this.client.getAnnotation(d.event['add_annotation'])
+              .then(data => {
+                if(this.items.get(d.event['add_annotation']))
+                  return;
+                this.items.add(CamomileSegmentation._transformItem(data),17);
+              })
+          }
 
 
-          });
         });
-
-
-        layerInstance.addEventListener("deselect", () => {
-          this.client= null;
-          this.layer=null;
-          this.annotations=null;
-          this._clearTimeline();
-        });
-
-
-        const mediumViewInstance = document.getElementById(this.srcMediumView);
-
-        mediumViewInstance.addEventListener("ready", () => {
-          this.client = mediumViewInstance.client;
-          this.medium=mediumViewInstance.medium;
-
-          if(this.layer)
-            this._populateAnnotations(this.layer,this.medium);
-        });
-
-
-
-        mediumViewInstance.addEventListener("reset", () => {
-          this.client= null;
-          this.medium=null;
-          this.annotations=null;
-          this._clearTimeline();
-        });
-
-
-        this._loadVis();
-
       }
+
+      _resetLayer() {
+        this.client= null;
+        this.layer=null;
+        this.annotations=null;
+        this._clearTimeline();
+      }
+
+      _setupMediumView(mediumViewInstance) {
+        this.client = mediumViewInstance.client;
+        this.medium=mediumViewInstance.medium;
+
+        if(this.layer)
+          this._populateAnnotations(this.layer,this.medium);
+      }
+
+      _resetMediumView() {
+        this.client= null;
+        this.medium=null;
+        this.annotations=null;
+        this._clearTimeline();
+      }
+
 
       static _transformItem({_id,fragment:{start,end},data})
       {

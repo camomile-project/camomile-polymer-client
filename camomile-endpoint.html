@@ -1,4 +1,4 @@
-<link rel="import" href="bower_components/polymer/polymer-element.html">
+<link rel="import" href="node_modules/@polymer/polymer/polymer-element.html">
 <script src="cookie.js"></script>
 
 <dom-module id="camomile-endpoint">
@@ -41,16 +41,18 @@
           }
         }
 
-
+        if(this.url) {
+          this.dispatchEvent(new CustomEvent('endpointSet', {}));
+        }
       }
 
       setEndPoint(e) {
         e.preventDefault();
 
-
         this.url=this.shadowRoot.querySelector("#endpoint").value;
         this.endPointSet=true;
         setCookie("endpoint",this.url,10);
+        this.dispatchEvent(new CustomEvent('endpointSet', {}));
       }
 
       resetEndPoint(e) {

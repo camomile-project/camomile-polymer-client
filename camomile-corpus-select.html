@@ -1,5 +1,5 @@
-<link rel="import" href="bower_components/polymer/polymer-element.html">
-<link rel="import" href="bower_components/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="node_modules/@polymer/polymer/polymer-element.html">
+<link rel="import" href="node_modules/@polymer/polymer/lib/elements/dom-repeat.html">
 <script src="cookie.js"></script>
 
 <dom-module id="camomile-corpus-select">
@@ -28,38 +28,43 @@
         super();
       }
 
+      _setupCorpora(loginInstance) {
+        this.client = loginInstance.client;
+        this.client.getCorpora()
+          .then(data => {
+            console.log("corpora",data);
+            this.corpora = data;
+
+            setTimeout(() => {
+              const v=getCookie("corpus");
+              if(v!=="") {
+                this.$.corpus.value=v;
+                return this.selectCorpus(v);
+              }
+            },0);
+          })
+          .catch(err => {
+            console.log(err);
+          });
+      }
+
+      _resetCorpora() {
+        this.client=null;
+        this.corpora=[];
+        this.corpus=null;
+
+        setCookie("corpus","",0);
+        this.dispatchEvent(new CustomEvent('deselect', {}));
+      }
+
       ready() {
         super.ready();
         const loginInstance = document.getElementById(this.srcLogin);
 
-        loginInstance.addEventListener("login", () => {
-          this.client = loginInstance.client;
-          this.client.getCorpora()
-            .then(data => {
-              console.log("corpora",data);
-              this.corpora = data;
-
-              setTimeout(() => {
-                const v=getCookie("corpus");
-                if(v!=="") {
-                  this.$.corpus.value=v;
-                  return this.selectCorpus(v);
-                }
-              },0);
-            })
-            .catch(err => {
-              console.log(err);
-            });
-        });
-
-        loginInstance.addEventListener("logout", () => {
-          this.client=null;
-          this.corpora=[];
-
-          setCookie("corpus","",0);
-          this.dispatchEvent(new CustomEvent('deselect', {}));
-        });
-
+        if(loginInstance.logged_in)
+          this._setupCorpora(loginInstance);
+        loginInstance.addEventListener("login",() => this._setupCorpora(loginInstance));
+        loginInstance.addEventListener("logout", () => this._resetCorpora());
       }
 
       select(e) {
@@ -70,7 +75,8 @@
 
       selectCorpus(corpus) {
         console.log("corpus", corpus);
-        return this.dispatchEvent(new CustomEvent('select', {detail: {corpus: corpus}}));
+        this.corpus=corpus;
+        return this.dispatchEvent(new CustomEvent('select', {}));
       }
 
       static get properties() {

@@ -1,4 +1,4 @@
-<link rel="import" href="bower_components/polymer/polymer-element.html">
+<link rel="import" href="node_modules/@polymer/polymer/polymer-element.html">
 <script src="node_modules/wavesurfer.js/dist/wavesurfer.min.js"></script>
 
 <dom-module id="camomile-wave-player">
@@ -21,42 +21,49 @@
         this.loading=false;
         this.loaded=false;
       }
+      
+      _setupMediumView(mediumView) {
+        this.wavesurfer.load(mediumView.medium_url);
+        this.loading=true;
+        this.wavesurfer.on("ready",() => {
+          this.loading=false;
+          this.loaded=true;
+        });
+        this.wavesurfer.on("loading",(loadingProgress) => {
+          this.loadingProgress=loadingProgress;
+        })
+      }
+      
+      _resetMediumView() {
+        this.wavesurfer.empty();
+        this.loading=false;
+        this.loaded=false;
+      }
 
       ready() {
         super.ready();
         this.loading=false;
 
-        const wavesurfer = WaveSurfer.create({
+        this.wavesurfer = WaveSurfer.create({
           container: this.$.waveform,
-          xhrWithCredentials: true
+          xhrWithCredentials: true,
+          barHeight:5
         });
 
 
         const mediumView = document.getElementById(this.srcMediumView);
 
-        mediumView.addEventListener("ready", () => {
-          wavesurfer.load(mediumView.medium_url);
-          this.loading=true;
-          wavesurfer.on("ready",() => {
-            this.loading=false;
-            this.loaded=true;
-          });
-          wavesurfer.on("loading",(loadingProgress) => {
-            this.loadingProgress=loadingProgress;
-          })
-        });
-
-        mediumView.addEventListener("reset", () => {
-          wavesurfer.empty();
-          this.loading=false;
-          this.loaded=false;
-        });
+        if(mediumView.medium) {
+          this._setupMediumView(mediumView)
+        }
+        mediumView.addEventListener("ready", () => this._setupMediumView(mediumView));
+        mediumView.addEventListener("reset", () => this._resetMediumView());
 
         this.beingSought=false;
-        wavesurfer.on("seek",() => {
+        this.wavesurfer.on("seek",() => {
           if(this.beingSought)
             return;
-          mediumView.currentTime=wavesurfer.getCurrentTime();
+          mediumView.currentTime=this.wavesurfer.getCurrentTime();
           mediumView.dispatchEvent(new CustomEvent("timeupdate",{detail:{sender:this.id}}));
         });
 
@@ -65,7 +72,7 @@
           if (sender === this.id)
             return;
           this.beingSought=true;
-          wavesurfer.seekAndCenter(mediumView.currentTime/wavesurfer.getDuration());
+          this.wavesurfer.seekAndCenter(mediumView.currentTime/this.wavesurfer.getDuration());
           this.beingSought=false;
         });
 
@@ -74,7 +81,7 @@
           if (sender === this.id || !this.loaded)
             return;
 
-          wavesurfer.zoom(this.$.waveform.clientWidth/(mediumView.range.end-mediumView.range.start));
+          this.wavesurfer.zoom(this.$.waveform.clientWidth/(mediumView.range.end-mediumView.range.start));
         });
       }
 

@@ -1,4 +1,4 @@
-<link rel="import" href="bower_components/polymer/polymer-element.html">
+<link rel="import" href="node_modules/@polymer/polymer/polymer-element.html">
 
 <dom-module id="camomile-medium-create">
 
@@ -25,18 +25,26 @@
         super();
       }
 
+      _setupCorpus(corpusInstance) {
+        this.client = corpusInstance.client;
+        this.corpus = corpusInstance.corpus;
+      }
+
+      _resetCorpus() {
+        this.client = null;
+        this.corpus=null;
+      }
+
       ready() {
         super.ready();
 
         const corpusInstance = document.getElementById(this.srcCorpus);
-        corpusInstance.addEventListener("select", ({detail: {corpus}}) => {
-          this.client = corpusInstance.client;
-          this.corpus = corpus;
-        });
-        corpusInstance.addEventListener("deselect", () => {
-          this.client = null;
-          this.corpus=null;
-        });
+
+        if(corpusInstance.corpus)
+          this._setupCorpus(corpusInstance);
+        corpusInstance.addEventListener("select", () => this._setupCorpus(corpusInstance));
+
+        corpusInstance.addEventListener("deselect", () => this._resetCorpus());
       }
 
       create(e) {
