@@ -41,16 +41,18 @@
           }
         }
 
-
+        if(this.url) {
+          this.dispatchEvent(new CustomEvent('endpointSet', {}));
+        }
       }
 
       setEndPoint(e) {
         e.preventDefault();
 
-
         this.url=this.shadowRoot.querySelector("#endpoint").value;
         this.endPointSet=true;
         setCookie("endpoint",this.url,10);
+        this.dispatchEvent(new CustomEvent('endpointSet', {}));
       }
 
       resetEndPoint(e) {

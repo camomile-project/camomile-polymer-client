@@ -15,24 +15,29 @@
         super();
       }
 
+      _setupMedium(mediumInstance) {
+        this.medium=mediumInstance.medium;
+        this.client=mediumInstance.client;
+        this.medium_url = this.client.getMediumURL(mediumInstance.medium, 'webm');
+        this.dispatchEvent(new CustomEvent('ready', {}));
+      }
+
+      _resetMedium() {
+        this.medium=null;
+        this.medium_url="";
+        this.client=null;
+        this.dispatchEvent(new CustomEvent('reset', {}));
+      }
+
       ready() {
         super.ready();
 
         const mediumInstance = document.getElementById(this.srcMedium);
 
-        mediumInstance.addEventListener("select", ({detail: {medium}}) => {
-          this.medium=medium;
-          this.client=mediumInstance.client;
-          this.medium_url = this.client.getMediumURL(medium, 'webm');
-          this.dispatchEvent(new CustomEvent('ready', {}));
-        });
-
-        mediumInstance.addEventListener("deselect", () => {
-          this.medium=null;
-          this.medium_url="";
-          this.client=null;
-          this.dispatchEvent(new CustomEvent('reset', {}));
-        });
+        if(mediumInstance.medium)
+          this._setupMedium(mediumInstance);
+        mediumInstance.addEventListener("select", () => this._setupMedium(mediumInstance));
+        mediumInstance.addEventListener("deselect", () => this._resetMedium());
       }
 
       static get properties() {

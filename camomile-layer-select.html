@@ -28,46 +28,52 @@
         super();
       }
 
+      _setupCorpus(corpusInstance) {
+        if(this.corpus) {
+          this.client.unwatchCorpus(this.corpus);
+          this.dispatchEvent(new CustomEvent('deselect', {}));
+          setCookie("layer","",0);
+        }
+
+        this.client = corpusInstance.client;
+        this.corpus=corpusInstance.corpus;
+
+        this._populateLayers(corpusInstance.corpus).then(() => {
+          setTimeout(() => {
+            const v=getCookie("layer");
+            if(v!=="") {
+              this.$.layer.value=v;
+              return this.selectLayer(v);
+            }
+          },0);
+        });
+
+        this.client.watchCorpus(corpusInstance.corpus, () => {
+          this._populateLayers(corpusInstance.corpus);
+        });
+      }
+
+      _resetCorpus() {
+        this.client=null;
+        this.layers=[];
+        this.corpus=null;
+        this.layer=null;
+        setCookie("layer","",0);
+
+
+        this.dispatchEvent(new CustomEvent('deselect', {}));
+      }
+
       ready() {
         super.ready();
 
         const corpusInstance = document.getElementById(this.srcCorpus);
 
-        corpusInstance.addEventListener("select", ({detail: {corpus}}) => {
-          if(this.corpus) {
-            this.client.unwatchCorpus(this.corpus);
-            this.dispatchEvent(new CustomEvent('deselect', {}));
-            setCookie("layer","",0);
-          }
+        if(corpusInstance.corpus)
+          this._setupCorpus(corpusInstance);
+        corpusInstance.addEventListener("select", () => this._setupCorpus(corpusInstance));
 
-          this.client = corpusInstance.client;
-          this.corpus=corpus;
-
-          this._populateLayers(corpus).then(() => {
-            setTimeout(() => {
-              const v=getCookie("layer");
-              if(v!=="") {
-                this.$.layer.value=v;
-                return this.selectLayer(v);
-              }
-            },0);
-          });
-
-          this.client.watchCorpus(corpus, () => {
-            this._populateLayers(corpus);
-          });
-        });
-
-
-        corpusInstance.addEventListener("deselect", () => {
-          this.client=null;
-          this.layers=[];
-          this.corpus=null;
-          setCookie("layer","",0);
-
-
-          this.dispatchEvent(new CustomEvent('deselect', {}));
-        })
+        corpusInstance.addEventListener("deselect", () => this._resetCorpus());
 
       }
 
@@ -90,7 +96,8 @@
 
       selectLayer(layer) {
         console.log("layer", layer);
-        this.dispatchEvent(new CustomEvent('select', {detail: {layer: layer}}));
+        this.layer=layer;
+        this.dispatchEvent(new CustomEvent('select', {}));
       }
 
       static get properties() {

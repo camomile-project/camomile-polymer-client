@@ -30,28 +30,33 @@
 
       constructor() {
         super();
+        this.logged_in=false;
       }
 
-      ready() {
-        super.ready();
-        this.logged_in=false;
-
-
-        const camomileInstance=document.getElementById(this.srcEndpoint);
+      _setupEndPoint(camomileInstance) {
         const url=camomileInstance.url;
-
-        camomileInstance.addEventListener("endpointReset",() => {
-          if(this.logged_in)
-            this.logout();
-        });
-
-
         this.client = new Camomile(url);
         this.authenticate();
       }
 
+      _resetEndPoint() {
+        if(this.logged_in)
+          this.logout();
+      }
+
+      ready() {
+        super.ready();
+        const camomileInstance=document.getElementById(this.srcEndpoint);
+
+        if(camomileInstance.endPointSet)
+          this._setupEndPoint(camomileInstance);
+        camomileInstance.addEventListener("endpointSet",() => this._setupEndPoint(camomileInstance));
+
+        camomileInstance.addEventListener("endpointReset",() => this._resetEndPoint());
+      }
+
       authenticate() {
-        this.client.me()
+        return this.client.me()
           .then(({username}) => {
             this.username=username;
             this.logged_in=true;
@@ -64,15 +69,11 @@
 
       login(e) {
         e.preventDefault();
-        const url = document.getElementById(this.srcEndpoint).url;
-        this.client = new Camomile(url);
 
-
-        this.client.login(this.shadowRoot.querySelector("#user").value, this.shadowRoot.querySelector("#password").value)
+        return this.client.login(this.shadowRoot.querySelector("#user").value, this.shadowRoot.querySelector("#password").value)
           .then(r => {
             console.log(r);
-            this.authenticate();
-            return this.dispatchEvent(new CustomEvent('login', {}));
+            return this.authenticate();
           })
           .catch(e => {
             console.log(e);
@@ -84,6 +85,7 @@
         if(e) e.preventDefault();
         this.client.logout().then(() => {
           this.logged_in=false;
+          console.log("logout");
           return this.dispatchEvent(new CustomEvent('logout', {}));
         })
       }

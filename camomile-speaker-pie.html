@@ -58,6 +58,23 @@
         this.firstTime=true;
       }
 
+      ready() {
+        super.ready();
+        this.createElements();
+
+        const layerInstance = document.getElementById(this.srcLayer);
+        if(layerInstance.layer)
+          this._setupLayer(layerInstance);
+        layerInstance.addEventListener("select", () => this._setupLayer(layerInstance));
+        layerInstance.addEventListener("deselect", () => this._resetLayer());
+
+        const mediumInstance = document.getElementById(this.srcMedium);
+        if(mediumInstance.medium)
+          this._setupMedium(mediumInstance);
+        mediumInstance.addEventListener("select", () => this._setupMedium(mediumInstance));
+        mediumInstance.addEventListener("deselect", () => this._resetMedium());
+      }
+
       createElements() {
         const width = 500;
         const height = 500;
@@ -114,65 +131,51 @@
           .style('fill', (d) => this.color(d.data.type));
       }
 
-      ready() {
-        super.ready();
+      _setupLayer(layerInstance) {
+        if(this.layer) {
+          this.client.unwatchLayer(this.layer);
+        }
 
 
-        this.createElements();
+        this.client = layerInstance.client;
 
-        const layerInstance = document.getElementById(this.srcLayer);
+        this.layer=layerInstance.layer;
+        if(this.medium)
+          this._populateAnnotations(this.layer,this.medium);
 
-        layerInstance.addEventListener("select", ({detail: {layer}}) => {
-          if(this.layer) {
-            this.client.unwatchLayer(this.layer);
-          }
+        console.log("speaker pie watch layer",layerInstance.layer);
+        this.client.watchLayer(layerInstance.layer, () => {
+          this._populateAnnotations(this.layer,this.medium);
 
-
-          this.client = layerInstance.client;
-
-          this.layer=layer;
-          if(this.medium)
-            this._populateAnnotations(this.layer,this.medium);
-
-          this.client.watchLayer(layer, () => {
-            this._populateAnnotations(this.layer,this.medium);
-
-          });
         });
+      }
 
-        layerInstance.addEventListener("deselect", () => {
-          this.client= null;
-          this.layer=null;
-          this.data=[];
-          this.legendData=[];
-          if(this.g)
-            this.g.remove();
-          this.firstTime=true;
-        });
+      _resetLayer() {
+        this.client= null;
+        this.layer=null;
+        this.data=[];
+        this.legendData=[];
+        if(this.g)
+          this.g.remove();
+        this.firstTime=true;
+      }
 
+      _setupMedium(mediumInstance) {
+        this.client = mediumInstance.client;
+        this.medium=mediumInstance.medium;
 
+        if(this.layer)
+          this._populateAnnotations(this.layer,this.medium);
+      }
 
-        const mediumInstance = document.getElementById(this.srcMedium);
-
-        mediumInstance.addEventListener("select", ({detail: {medium}}) => {
-          this.client = mediumInstance.client;
-          this.medium=medium;
-
-          if(this.layer)
-            this._populateAnnotations(this.layer,this.medium);
-        });
-
-
-        mediumInstance.addEventListener("deselect", () => {
-          this.client= null;
-          this.medium=null;
-          this.data=[];
-          this.legendData=[];
-          if(this.g)
-            this.g.remove();
-          this.firstTime=true;
-        });
-
+      _resetMedium() {
+        this.client= null;
+        this.medium=null;
+        this.data=[];
+        this.legendData=[];
+        if(this.g)
+          this.g.remove();
+        this.firstTime=true;
       }
 
       _populateAnnotations(layer,medium) {
