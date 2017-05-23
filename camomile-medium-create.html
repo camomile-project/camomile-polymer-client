@@ -1,15 +1,23 @@
-<link rel="import" href="node_modules/@polymer/polymer/polymer-element.html">
+<link rel="import" href="bower_components/polymer/polymer-element.html">
+<link rel="import" href="src/shared-styles.html">
+<script src="getElementAt.js"></script>
 
 <dom-module id="camomile-medium-create">
 
   <template>
-    <div>
-      Medium creation :
-      <form on-submit="create">
-        <label>Name : <input type="text" id="name"/></label>
-        <label>Url : <input type="text" id="url"/></label>
-        <label>Description : <input type="text" id="description"/></label>
-        <input type="submit" value="Create"/>
+    <style include="shared-styles">
+      :host {
+        display: block;
+        padding: 10px;
+      }
+    </style>
+    <div class="card">
+      <h2>Medium creation</h2>
+      <form>
+        <paper-input label="Name" type="text" id="name" required></paper-input>
+        <paper-input label="Url" type="text" id="url" required></paper-input>
+        <paper-input label="Description" type="text" id="description" required></paper-input>
+        <paper-button raised class="indigo" on-click="create">Create</paper-button>
       </form>
       {{creation_status}}
     </div>
@@ -38,7 +46,7 @@
       ready() {
         super.ready();
 
-        const corpusInstance = document.getElementById(this.srcCorpus);
+        const corpusInstance = getElementAt(this.srcCorpus);
 
         if(corpusInstance.corpus)
           this._setupCorpus(corpusInstance);

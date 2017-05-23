@@ -1,4 +1,5 @@
-<link rel="import" href="node_modules/@polymer/polymer/polymer-element.html">
+<link rel="import" href="bower_components/polymer/polymer-element.html">
+<script src="getElementAt.js"></script>
 
 
 <dom-module id="camomile-layer-state">
@@ -21,14 +22,14 @@
       ready() {
         super.ready();
 
-        const layerInstance = document.getElementById(this.srcLayer);
+        const layerInstance = getElementAt(this.srcLayer);
 
         if(layerInstance.layer)
           this._setupLayer(layerInstance);
         layerInstance.addEventListener("select", () => this._setupLayer(layerInstance));
         layerInstance.addEventListener("deselect", () => this._resetLayer());
 
-        const mediumInstance = document.getElementById(this.srcMedium);
+        const mediumInstance = getElementAt(this.srcMedium);
         if(mediumInstance.medium)
           this._setupMedium(mediumInstance);
         mediumInstance.addEventListener("select", () => this._setupMedium(mediumInstance));

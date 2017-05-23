@@ -1,6 +1,7 @@
-<link rel="import" href="node_modules/@polymer/polymer/polymer-element.html">
-<link rel="import" href="node_modules/@polymer/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="bower_components/polymer/polymer-element.html">
+<link rel="import" href="bower_components/polymer/lib/elements/dom-repeat.html">
 <script src="cookie.js"></script>
+<script src="getElementAt.js"></script>
 
 <dom-module id="camomile-layer-select">
 
@@ -67,7 +68,7 @@
       ready() {
         super.ready();
 
-        const corpusInstance = document.getElementById(this.srcCorpus);
+        const corpusInstance = getElementAt(this.srcCorpus);
 
         if(corpusInstance.corpus)
           this._setupCorpus(corpusInstance);

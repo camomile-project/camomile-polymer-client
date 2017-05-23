@@ -1,21 +1,30 @@
-<link rel="import" href="node_modules/@polymer/polymer/polymer-element.html">
-<link rel="import" href="node_modules/@polymer/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="bower_components/polymer/polymer-element.html">
+<link rel="import" href="bower_components/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="bower_components/paper-dropdown-menu/paper-dropdown-menu-light.html">
+<link rel="import" href="bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="bower_components/paper-item/paper-item.html">
+<link rel="import" href="src/shared-styles.html">
 <script src="cookie.js"></script>
+<script src="getElementAt.js"></script>
 
 <dom-module id="camomile-corpus-select">
 
   <template>
-    <form on-submit="select">
-      <label>
-        Choose a corpus :
-        <select id="corpus">
-          <template is="dom-repeat" items="{{corpora}}">
-            <option value="{{item._id}}">{{item.name}}</option>
-          </template>
-        </select>
-      </label>
-      <input type="submit" value="select"/>
-    </form>
+    <style include="shared-styles">
+      :host {
+        display: block;
+        padding: 10px;
+      }
+    </style>
+    <div class="card">
+    <paper-dropdown-menu-light label="Corpus" id="corpus">
+      <paper-listbox slot="dropdown-content" class="dropdown-content" selected="{{corpus}}" attr-for-selected="id">
+        <template is="dom-repeat" items="{{corpora}}">
+          <paper-item id="{{item._id}}">{{item.name}}</paper-item>
+        </template>
+      </paper-listbox>
+    </paper-dropdown-menu-light>
+    </div>
   </template>
 
   <script>
@@ -38,8 +47,7 @@
             setTimeout(() => {
               const v=getCookie("corpus");
               if(v!=="") {
-                this.$.corpus.value=v;
-                return this.selectCorpus(v);
+                this.corpus=v;
               }
             },0);
           })
@@ -59,7 +67,7 @@
 
       ready() {
         super.ready();
-        const loginInstance = document.getElementById(this.srcLogin);
+        const loginInstance = getElementAt(this.srcLogin);
 
         if(loginInstance.logged_in)
           this._setupCorpora(loginInstance);
@@ -67,22 +75,24 @@
         loginInstance.addEventListener("logout", () => this._resetCorpora());
       }
 
-      select(e) {
-        e.preventDefault();
-        setCookie("corpus",this.$.corpus.value,10);
-        this.selectCorpus(this.$.corpus.value);
-      }
-
       selectCorpus(corpus) {
         console.log("corpus", corpus);
-        this.corpus=corpus;
         return this.dispatchEvent(new CustomEvent('select', {}));
+      }
+
+      _corpusChanged() {
+        setCookie("corpus",this.corpus,10);
+        this.selectCorpus(this.corpus);
       }
 
       static get properties() {
         return {
           srcLogin: String,
-          id: String
+          id: String,
+          corpus:{
+            type: String,
+            observer:'_corpusChanged'
+          }
         };
       }
     }

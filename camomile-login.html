@@ -1,7 +1,8 @@
 <script src="node_modules/camomile-client/camomile.js"></script>
 
-<link rel="import" href="node_modules/@polymer/polymer/polymer-element.html">
-<link rel="import" href="node_modules/@polymer/polymer/lib/elements/dom-if.html">
+<link rel="import" href="bower_components/polymer/polymer-element.html">
+<link rel="import" href="bower_components/polymer/lib/elements/dom-if.html">
+<script src="getElementAt.js"></script>
 
 <dom-module id="camomile-login">
 
@@ -46,7 +47,7 @@
 
       ready() {
         super.ready();
-        const camomileInstance=document.getElementById(this.srcEndpoint);
+        const camomileInstance=getElementAt(this.srcEndpoint);
 
         if(camomileInstance.endPointSet)
           this._setupEndPoint(camomileInstance);
