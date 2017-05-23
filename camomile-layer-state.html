@@ -1,0 +1,166 @@
+<link rel="import" href="node_modules/@polymer/polymer/polymer-element.html">
+
+
+<dom-module id="camomile-layer-state">
+
+  <template>
+  </template>
+
+  <script>
+
+    // not storing any data, just doing the server communication
+
+    // update/delete/add event/methods + optional sync with server
+    class CamomileLayerState extends Polymer.Element {
+      static get is() {
+        return "camomile-layer-state";
+      }
+
+      constructor() {
+        super();
+      }
+
+      ready() {
+        super.ready();
+
+        const layerInstance = document.getElementById(this.srcLayer);
+
+        if(layerInstance.layer)
+          this._setupLayer(layerInstance);
+        layerInstance.addEventListener("select", () => this._setupLayer(layerInstance));
+        layerInstance.addEventListener("deselect", () => this._resetLayer());
+
+        const mediumInstance = document.getElementById(this.srcMedium);
+        if(mediumInstance.medium)
+          this._setupMedium(mediumInstance);
+        mediumInstance.addEventListener("select", () => this._setupMedium(mediumInstance));
+        mediumInstance.addEventListener("deselect", () => this._resetMedium());
+
+      }
+
+      // do it both on local and remote edit + plan offline mode (not real time)
+      // currently going edit => server then server => event/edit (using wait)
+      // because add without server isn't really possible currently
+
+      addAnnotation(d) {
+        const {start,end,data}=d;
+        return this.client.createAnnotation(this.layer,this.medium,{start,end},data);
+      }
+
+      updateAnnotation(id,data) {
+        return this.client.updateAnnotation(id,data);
+      }
+
+      deleteAnnotation(id) {
+        return this.client.deleteAnnotation(id);
+      }
+
+      _internalAdd(data,sender) {
+        const annotationIndex=this.annotations.findIndex(annotation => annotation._id===data._id);
+        if(annotationIndex!==-1)
+          return;
+        this.push("annotations",data);
+        this.annotations.sort((a,b) => a.fragment.start - b.fragment.start);
+        this.dispatchEvent(new CustomEvent("add_annotation",{detail:{data,sender}}));
+      }
+
+      _internalUpdate(data,sender) {
+        const annotationIndex=this.annotations.findIndex(annotation => annotation._id===data._id);
+        this.splice("annotations", annotationIndex, 1,data);
+        this.annotations.sort((a,b) => a.fragment.start - b.fragment.start);
+        this.dispatchEvent(new CustomEvent("update_annotation",{detail:{data,sender}}));
+      }
+
+      _internalDelete(id,sender) {
+        const annotationIndex=this.annotations.findIndex(annotation => annotation._id===id);
+        this.splice("annotations", annotationIndex, 1);
+        this.dispatchEvent(new CustomEvent("delete_annotation", {detail: {id, sender}}));
+      }
+
+      _setupLayer(layerInstance) {
+        if(this.layer) {
+          this.client.unwatchLayer(this.layer);
+        }
+
+        this.client = layerInstance.client;
+        this.layer=layerInstance.layer;
+        if(this.medium)
+          this._populateAnnotations(this.layer,this.medium);
+
+        console.log("layer state watch layer",layerInstance.layer);
+        this.client.watchLayer(layerInstance.layer, (data) => {
+          try {
+            const d = JSON.parse(data.data);
+            if (d.event['update_annotation']) {
+              this.client.getAnnotation(d.event['update_annotation'])
+                .then(data => {
+                  return this._internalUpdate(data, 0);
+                })
+                .catch(err => console.log(err))
+            }
+
+            if (d.event['delete_annotation']) {
+              this._internalDelete(d.event['delete_annotation'], 0);
+            }
+
+            if (d.event['add_annotation']) {
+              this.client.getAnnotation(d.event['add_annotation'])
+                .then(data => {
+                  return this._internalAdd(data, 0);
+                })
+                .catch(err => console.log(err))
+            }
+          }
+          catch(err) {
+            console.log(err);
+          }
+        });
+      }
+
+      _resetLayer() {
+        this.client= null;
+        this.layer=null;
+        this.annotations=null;
+        this.dispatchEvent(new CustomEvent("reset",{}));
+      }
+
+      _setupMedium(mediumInstance) {
+        this.client = mediumInstance.client;
+        this.medium=mediumInstance.medium;
+
+        if(this.layer)
+          this._populateAnnotations(this.layer,this.medium);
+      }
+
+      _resetMedium() {
+        this.client= null;
+        this.medium=null;
+        this.annotations=null;
+        this.dispatchEvent(new CustomEvent("reset",{}));
+      }
+
+      _populateAnnotations(layer,medium) {
+        this.client.getAnnotations({filter:{id_layer:layer,id_medium:medium}})
+          .then(data => {
+            console.log("annotations",data);
+            data = data.sort((a,b) => a.fragment.start - b.fragment.start);
+            this.annotations=data;
+            this.dispatchEvent(new CustomEvent("populate_annotations",{detail:{data}}));
+          })
+          .catch(err => {
+            console.log(err);
+          });
+      }
+
+      static get properties() {
+        return {
+          srcLayer: String,
+          srcMedium: String,
+          id: String
+        };
+      }
+    }
+    customElements.define(CamomileLayerState.is, CamomileLayerState);
+  </script>
+
+</dom-module>
