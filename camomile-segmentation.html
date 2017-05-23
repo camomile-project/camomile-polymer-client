@@ -81,6 +81,7 @@
             this.$.edit.onsubmit=(e) => {
               e.preventDefault();
               item.content=this.$.label.value;
+              item.title=item.content;
               item.end=item.start+100;
               this.$.label.value="";
               this.$.edit.style="display:none";
@@ -102,6 +103,7 @@
             this.$.edit.onsubmit=(e) => {
               e.preventDefault();
               item.content=this.$.label.value;
+              item.title=item.content;
               this.$.label.value="";
               this.$.edit.style="display:none";
               this.$.edit.onsubmit=null;
@@ -151,7 +153,8 @@
           id: _id,
           start,
           end,
-          content: data
+          content: data,
+          title:data
         }
       }
 
