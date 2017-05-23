@@ -62,17 +62,52 @@
         super.ready();
         this.createElements();
 
-        const layerInstance = document.getElementById(this.srcLayer);
-        if(layerInstance.layer)
-          this._setupLayer(layerInstance);
-        layerInstance.addEventListener("select", () => this._setupLayer(layerInstance));
-        layerInstance.addEventListener("deselect", () => this._resetLayer());
+        const layerState = document.getElementById(this.srcLayerState);
 
-        const mediumInstance = document.getElementById(this.srcMedium);
-        if(mediumInstance.medium)
-          this._setupMedium(mediumInstance);
-        mediumInstance.addEventListener("select", () => this._setupMedium(mediumInstance));
-        mediumInstance.addEventListener("deselect", () => this._resetMedium());
+        const refreshData= (data) => {
+          this.m=data.reduce((acc,e) => {
+            const length=e.fragment.end-e.fragment.start;
+            acc[e.data]=acc[e.data] ? acc[e.data]+length : length;
+            return acc;
+          },{});
+          this.s=Object.keys(this.m).reduce((s,e) => s+this.m[e],0);
+          this.data=Object.keys(this.m).map((l,i) => ({id:i,type:l,amount:this.m[l]}));
+
+          this.legendData=this.data.sort((a,b) => a.amount-b.amount).reverse().map(({type,amount}) => ({
+            color:this.color(type),
+            label:type,
+            value:Math.round(amount,1)+"s",
+            ratio:Math.round(amount/this.s*100)+"%"
+          }));
+          if(this.firstTime) {
+            this.drawChart();
+            this.firstTime=false;
+          }
+          else {
+            this.refreshChart();
+          }
+        };
+
+        layerState.addEventListener("populate_annotations",() => {
+          refreshData(layerState.annotations);
+        });
+        layerState.addEventListener("reset_annotations",() => {
+          this.data=[];
+          this.legendData=[];
+          if(this.g)
+            this.g.remove();
+          this.firstTime=true;
+        });
+
+        layerState.addEventListener("add_annotation",() => {
+          refreshData(layerState.annotations);
+        });
+        layerState.addEventListener("update_annotation",() => {
+          refreshData(layerState.annotations);
+        });
+        layerState.addEventListener("delete_annotation",() => {
+          refreshData(layerState.annotations);
+        });
       }
 
       createElements() {
@@ -131,88 +166,9 @@
           .style('fill', (d) => this.color(d.data.type));
       }
 
-      _setupLayer(layerInstance) {
-        if(this.layer) {
-          this.client.unwatchLayer(this.layer);
-        }
-
-
-        this.client = layerInstance.client;
-
-        this.layer=layerInstance.layer;
-        if(this.medium)
-          this._populateAnnotations(this.layer,this.medium);
-
-        console.log("speaker pie watch layer",layerInstance.layer);
-        this.client.watchLayer(layerInstance.layer, () => {
-          this._populateAnnotations(this.layer,this.medium);
-
-        });
-      }
-
-      _resetLayer() {
-        this.client= null;
-        this.layer=null;
-        this.data=[];
-        this.legendData=[];
-        if(this.g)
-          this.g.remove();
-        this.firstTime=true;
-      }
-
-      _setupMedium(mediumInstance) {
-        this.client = mediumInstance.client;
-        this.medium=mediumInstance.medium;
-
-        if(this.layer)
-          this._populateAnnotations(this.layer,this.medium);
-      }
-
-      _resetMedium() {
-        this.client= null;
-        this.medium=null;
-        this.data=[];
-        this.legendData=[];
-        if(this.g)
-          this.g.remove();
-        this.firstTime=true;
-      }
-
-      _populateAnnotations(layer,medium) {
-        this.client.getAnnotations({filter:{id_layer:layer,id_medium:medium}})
-          .then(data => {
-            console.log("annotations",data);
-            this.m=data.reduce((acc,e) => {
-              const length=e.fragment.end-e.fragment.start;
-              acc[e.data]=acc[e.data] ? acc[e.data]+length : length;
-              return acc;
-            },{});
-            this.s=Object.keys(this.m).reduce((s,e) => s+this.m[e],0);
-            this.data=Object.keys(this.m).map((l,i) => ({id:i,type:l,amount:this.m[l]}));
-
-            this.legendData=this.data.sort((a,b) => a.amount-b.amount).reverse().map(({type,amount}) => ({
-              color:this.color(type),
-              label:type,
-              value:Math.round(amount,1)+"s",
-              ratio:Math.round(amount/this.s*100)+"%"
-            }));
-            if(this.firstTime) {
-              this.drawChart();
-              this.firstTime=false;
-            }
-            else {
-              this.refreshChart();
-            }
-          })
-          .catch(err => {
-            console.log(err);
-          });
-      }
-
       static get properties() {
         return {
-          srcLayer: String,
-          srcMedium: String,
+          srcLayerState: String,
           id: String
         };
       }

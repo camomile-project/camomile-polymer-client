@@ -26,71 +26,38 @@
       ready() {
         super.ready();
 
-        const layerInstance = document.getElementById(this.srcLayer);
+        const layerState = document.getElementById(this.srcLayerState);
 
-        if(layerInstance.layer)
-          this._setupLayer(layerInstance);
-        layerInstance.addEventListener("select", () => this._setupLayer(layerInstance));
-        layerInstance.addEventListener("deselect", () => this._resetLayer());
 
-        const mediumInstance = document.getElementById(this.srcMedium);
-        if(mediumInstance.medium)
-          this._setupMedium(mediumInstance);
-        mediumInstance.addEventListener("select", () => this._setupMedium(mediumInstance));
-        mediumInstance.addEventListener("deselect", () => this._resetMedium());
-
-      }
-
-      _setupLayer(layerInstance) {
-        if(this.layer) {
-          this.client.unwatchLayer(this.layer);
-        }
-
-        this.client = layerInstance.client;
-        this.layer=layerInstance.layer;
-        if(this.medium)
-          this._populateAnnotations(this.layer,this.medium);
-
-        console.log("segmentation table watch layer",layerInstance.layer);
-        this.client.watchLayer(layerInstance.layer, () => {
-          this._populateAnnotations(this.layer,this.medium);
+        layerState.addEventListener("populate_annotations",({detail:{data}}) => {
+          this.annotations=JSON.parse(JSON.stringify(data));
         });
-      }
+        layerState.addEventListener("reset_annotations",() => {
+          this.annotations=null;
+        });
 
-      _resetLayer() {
-        this.client= null;
-        this.layer=null;
-        this.annotations=null;
-      }
-
-      _setupMedium(mediumInstance) {
-        this.client = mediumInstance.client;
-        this.medium=mediumInstance.medium;
-
-        if(this.layer)
-          this._populateAnnotations(this.layer,this.medium);
-      }
-
-      _resetMedium() {
-        this.client= null;
-        this.medium=null;
-        this.annotations=null;
-      }
-
-      _populateAnnotations(layer,medium) {
-        this.client.getAnnotations({filter:{id_layer:layer,id_medium:medium}})
-          .then(data => {
-            console.log("annotations",data);
-            this.annotations = data.sort((a,b) => a.fragment.start - b.fragment.start);
-          })
-          .catch(err => {
-          });
+        // not sure how to use layerState.annotations without duplicating the changing code here (and using polymer data binding)
+        layerState.addEventListener("add_annotation",({detail:{data}}) => {
+          const annotationIndex=this.annotations.findIndex(annotation => annotation._id===data._id);
+          if(annotationIndex!==-1)
+            return;
+          this.push("annotations",data);
+          this.annotations.sort((a,b) => a.fragment.start - b.fragment.start);
+        });
+        layerState.addEventListener("update_annotation",({detail:{data}}) => {
+          const annotationIndex=this.annotations.findIndex(annotation => annotation._id===data._id);
+          this.splice("annotations", annotationIndex, 1,data);
+          this.annotations.sort((a,b) => a.fragment.start - b.fragment.start);
+        });
+        layerState.addEventListener("delete_annotation",({detail:{id}}) => {
+          const annotationIndex=this.annotations.findIndex(annotation => annotation._id===id);
+          this.splice("annotations", annotationIndex, 1);
+        });
       }
 
       static get properties() {
         return {
-          srcLayer: String,
-          srcMedium: String,
+          srcLayerState: String,
           id: String
         };
       }

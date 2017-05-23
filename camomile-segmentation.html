@@ -32,19 +32,29 @@
       ready() {
         super.ready();
 
-        const layerInstance = document.getElementById(this.srcLayer);
+        this.layerState = document.getElementById(this.srcLayerState);
 
-        if(layerInstance.layer)
-          this._setupLayer(layerInstance);
-        layerInstance.addEventListener("select", () => this._setupLayer(layerInstance));
-        layerInstance.addEventListener("deselect", () => this._resetLayer());
 
-        const mediumViewInstance = document.getElementById(this.srcMediumView);
+        this.layerState.addEventListener("populate_annotations",({detail:{data}}) => {
+          this._clearTimeline();
+          this._setupTimeline(data);
+        });
+        this.layerState.addEventListener("reset_annotations",() => {
+          this._clearTimeline();
+        });
 
-        if(mediumViewInstance.medium)
-          this._setupMediumView(mediumViewInstance);
-        mediumViewInstance.addEventListener("ready", () => this._setupMediumView(mediumViewInstance));
-        mediumViewInstance.addEventListener("reset", () => this._resetMediumView());
+        this.layerState.addEventListener("add_annotation",({detail:{data}}) => {
+          if(this.items.get(data._id))
+            return;
+          this.items.add(CamomileSegmentation._transformItem(data),17);
+        });
+        this.layerState.addEventListener("update_annotation",({detail:{data}}) => {
+          this.items.update(CamomileSegmentation._transformItem(data),17);
+        });
+        this.layerState.addEventListener("delete_annotation",({detail:{id}}) => {
+          this.items.remove(id,17);
+        });
+
 
         this._loadVis();
 
@@ -76,7 +86,7 @@
               this.$.edit.style="display:none";
               this.$.edit.onsubmit=null;
               const {start,end,content}=item;
-              this.client.createAnnotation(this.layer,this.medium,{start,end},content)
+              this.layerState.addAnnotation({start,end,data:content})
                 .then(result => {
                   item.id=result._id;
                   callback(item);
@@ -135,71 +145,6 @@
 
       }
 
-      _setupLayer(layerInstance) {
-        if(this.layer) {
-          this.client.unwatchLayer(this.layer);
-        }
-
-        this.client = layerInstance.client;
-
-        this.layer=layerInstance.layer;
-        if(this.medium)
-          this._populateAnnotations(this.layer,this.medium);
-
-        console.log("segmentation watch layer",layerInstance.layer);
-        this.client.watchLayer(layerInstance.layer, (data) => {
-
-          const d=JSON.parse(data.data);
-          console.log("watchLayer",d);
-
-          if(d.event['update_annotation']) {
-            this.client.getAnnotation(d.event['update_annotation'])
-              .then(data => {
-                this.items.update(CamomileSegmentation._transformItem(data),17);
-              })
-          }
-
-          if(d.event['delete_annotation']) {
-            this.items.remove(d.event['delete_annotation'],17);
-          }
-
-
-          if(d.event['add_annotation']) {
-            this.client.getAnnotation(d.event['add_annotation'])
-              .then(data => {
-                if(this.items.get(d.event['add_annotation']))
-                  return;
-                this.items.add(CamomileSegmentation._transformItem(data),17);
-              })
-          }
-
-
-        });
-      }
-
-      _resetLayer() {
-        this.client= null;
-        this.layer=null;
-        this.annotations=null;
-        this._clearTimeline();
-      }
-
-      _setupMediumView(mediumViewInstance) {
-        this.client = mediumViewInstance.client;
-        this.medium=mediumViewInstance.medium;
-
-        if(this.layer)
-          this._populateAnnotations(this.layer,this.medium);
-      }
-
-      _resetMediumView() {
-        this.client= null;
-        this.medium=null;
-        this.annotations=null;
-        this._clearTimeline();
-      }
-
-
       static _transformItem({_id,fragment:{start,end},data})
       {
         return {
@@ -230,7 +175,7 @@
         this._remover=(event, properties,senderId) => {
           if(senderId===17)
             return;
-          properties.items.forEach(annotation => this.client.deleteAnnotation(annotation));
+          properties.items.forEach(annotation => this.layerState.deleteAnnotation(annotation));
         };
 
         this.items.on('remove', this._remover);
@@ -240,7 +185,7 @@
             return;
           properties.items.forEach(annotation => {
             const item=this.items.get(annotation);
-            this.client.updateAnnotation(annotation,{
+            this.layerState.updateAnnotation(annotation,{
               data:item.content,
               fragment:{
                 start:item.start,
@@ -252,22 +197,9 @@
         this.items.on('update', this._updater);
       }
 
-      _populateAnnotations(layer,medium) {
-        this.client.getAnnotations({filter:{id_layer:layer,id_medium:medium}})
-          .then(data => {
-            console.log("annotations",data);
-
-            this._clearTimeline();
-            this._setupTimeline(data);
-
-          })
-          .catch(err => {
-          });
-      }
-
       static get properties() {
         return {
-          srcLayer: String,
+          srcLayerState: String,
           srcMediumView: String,
           id: String
         };
