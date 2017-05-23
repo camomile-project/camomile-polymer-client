@@ -36,7 +36,6 @@
           this.annotations=null;
         });
 
-        // not sure how to use layerState.annotations without duplicating the changing code here (and using polymer data binding)
         layerState.addEventListener("add_annotation",({detail:{data}}) => {
           const annotationIndex=this.annotations.findIndex(annotation => annotation._id===data._id);
           if(annotationIndex!==-1)
