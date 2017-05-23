@@ -6,17 +6,13 @@
 <dom-module id="camomile-layer-select">
 
   <template>
-    <form on-submit="select">
-      <label>
-        Choose a layer :
-        <select id="layer">
-          <template is="dom-repeat" items="{{layers}}">
-            <option value="{{item._id}}">{{item.name}}</option>
-          </template>
-        </select>
-      </label>
-      <input type="submit" value="select"/>
-    </form>
+    <paper-dropdown-menu-light label="Layer" id="layer">
+      <paper-listbox slot="dropdown-content" class="dropdown-content" selected="{{layer}}" attr-for-selected="id">
+        <template is="dom-repeat" items="{{layers}}">
+          <paper-item id="{{item._id}}">{{item.name}}</paper-item>
+        </template>
+      </paper-listbox>
+    </paper-dropdown-menu-light>
   </template>
 
   <script>
@@ -43,8 +39,7 @@
           setTimeout(() => {
             const v=getCookie("layer");
             if(v!=="") {
-              this.$.layer.value=v;
-              return this.selectLayer(v);
+              this.layer=v;
             }
           },0);
         });
@@ -89,22 +84,24 @@
           });
       }
 
-      select(e) {
-        e.preventDefault();
-        setCookie("layer",this.$.layer.value,10);
-        this.selectLayer(this.$.layer.value);
-      }
-
       selectLayer(layer) {
         console.log("layer", layer);
-        this.layer=layer;
         this.dispatchEvent(new CustomEvent('select', {}));
+      }
+
+      _layerChanged() {
+        setCookie("layer",this.layer,10);
+        this.selectLayer(this.layer);
       }
 
       static get properties() {
         return {
           srcCorpus: String,
-          id: String
+          id: String,
+          layer:{
+            type:String,
+            observer:'_layerChanged'
+          }
         };
       }
     }

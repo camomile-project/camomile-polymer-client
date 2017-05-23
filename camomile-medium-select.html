@@ -6,17 +6,13 @@
 <dom-module id="camomile-medium-select">
 
   <template>
-    <form on-submit="select">
-      <label>
-        Choose a medium :
-        <select id="medium">
-          <template is="dom-repeat" items="{{media}}">
-            <option value="{{item._id}}">{{item.name}}</option>
-          </template>
-        </select>
-      </label>
-      <input type="submit" value="select"/>
-    </form>
+    <paper-dropdown-menu-light label="Medium" id="medium">
+      <paper-listbox slot="dropdown-content" class="dropdown-content" selected="{{medium}}" attr-for-selected="id">
+        <template is="dom-repeat" items="{{media}}">
+          <paper-item id="{{item._id}}">{{item.name}}</paper-item>
+        </template>
+      </paper-listbox>
+    </paper-dropdown-menu-light>
   </template>
 
   <script>
@@ -55,8 +51,7 @@
           setTimeout(() => {
             const v=getCookie("medium");
             if(v!=="") {
-              this.$.medium.value=v;
-              return this.selectMedium(v);
+              this.medium=v;
             }
           },0);
         });
@@ -86,23 +81,24 @@
             console.log(err);
           });
       }
-
-      select(e) {
-        e.preventDefault();
-        setCookie("medium",this.$.medium.value,10);
-        this.selectMedium(this.$.medium.value);
-      }
-
       selectMedium(medium) {
         console.log("medium", medium);
-        this.medium=medium;
         this.dispatchEvent(new CustomEvent('select', {}));
+      }
+
+      _mediumChanged() {
+        setCookie("medium",this.medium,10);
+        this.selectMedium(this.medium);
       }
 
       static get properties() {
         return {
           srcCorpus: String,
-          id: String
+          id: String,
+          medium:{
+            type:String,
+            observer:'_mediumChanged'
+          }
         };
       }
     }

@@ -3,20 +3,12 @@
 <link rel="import" href="bower_components/paper-dropdown-menu/paper-dropdown-menu-light.html">
 <link rel="import" href="bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="bower_components/paper-item/paper-item.html">
-<link rel="import" href="src/shared-styles.html">
 <script src="cookie.js"></script>
 <script src="getElementAt.js"></script>
 
 <dom-module id="camomile-corpus-select">
 
   <template>
-    <style include="shared-styles">
-      :host {
-        display: block;
-        padding: 10px;
-      }
-    </style>
-    <div class="card">
     <paper-dropdown-menu-light label="Corpus" id="corpus">
       <paper-listbox slot="dropdown-content" class="dropdown-content" selected="{{corpus}}" attr-for-selected="id">
         <template is="dom-repeat" items="{{corpora}}">
@@ -24,7 +16,6 @@
         </template>
       </paper-listbox>
     </paper-dropdown-menu-light>
-    </div>
   </template>
 
   <script>
