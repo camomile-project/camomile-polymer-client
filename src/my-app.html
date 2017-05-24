@@ -1,13 +1,3 @@
-<!--
-@license
-Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
-This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
-The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
-The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
-Code distributed by Google as part of the polymer project is also
-subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
--->
-
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../bower_components/app-layout/app-drawer/app-drawer.html">
 <link rel="import" href="../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
@@ -97,7 +87,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <app-header slot="header" condenses reveals effects="waterfall">
           <app-toolbar>
             <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
-            <div main-title>Camomile Polymer Client</div>
+            <div>
+              <camomile-endpoint id="camomile1" style="display:inline-block;"></camomile-endpoint>
+              <camomile-login id="user1" src-endpoint="{{$.camomile1}}" style="display:inline-block;"></camomile-login>
+            </div>
           </app-toolbar>
         </app-header>
 
@@ -106,12 +99,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             attr-for-selected="name"
             fallback-selection="view404"
             role="main">
-          <my-view1 name="my-view1"></my-view1>
-          <my-view2 name="my-view2"></my-view2>
-          <my-view3 name="my-view3"></my-view3>
           <my-view404 name="my-view404"></my-view404>
-          <camomile-annotation name="camomile-annotation"></camomile-annotation>
-          <camomile-admin name="camomile-admin"></camomile-admin>
+          <camomile-annotation name="camomile-annotation" src-login="{{$.user1}}"></camomile-annotation>
+          <camomile-admin name="camomile-admin" src-login="{{$.user1}}"></camomile-admin>
         </iron-pages>
       </app-header-layout>
     </app-drawer-layout>

@@ -19,13 +19,10 @@
         padding: 10px;
       }
     </style>
-    <camomile-endpoint id="camomile1"></camomile-endpoint>
-    <camomile-login id="user1" src-endpoint="{{$.camomile1}}"></camomile-login>
 
+    <camomile-corpus-select id="corpus1" src-login="{{srcLogin}}"></camomile-corpus-select>
 
-    <camomile-corpus-select id="corpus1" src-login="{{$.user1}}"></camomile-corpus-select>
-
-    <camomile-corpus-create id="createCorpus1" src-login="{{$.user1}}"></camomile-corpus-create>
+    <camomile-corpus-create id="createCorpus1" src-login="{{srcLogin}}"></camomile-corpus-create>
     <camomile-medium-create id="createMedium1" src-corpus="{{$.corpus1}}"></camomile-medium-create>
     <camomile-layer-create id="createLayer" src-corpus="{{$.corpus1}}"></camomile-layer-create>
   </template>
@@ -34,6 +31,12 @@
   <script>
     class CamomileAdmin extends Polymer.Element {
       static get is() { return 'camomile-admin'; }
+
+      static get properties() {
+        return {
+          srcLogin: String
+        };
+      }
     }
 
     window.customElements.define(CamomileAdmin.is, CamomileAdmin);

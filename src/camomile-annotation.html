@@ -25,10 +25,8 @@
         padding: 10px;
       }
     </style>
-    <camomile-endpoint id="camomile1"></camomile-endpoint>
-    <camomile-login id="user1" src-endpoint="{{$.camomile1}}"></camomile-login>
 
-    <camomile-corpus-select id="corpus1" src-login="{{$.user1}}"></camomile-corpus-select>
+    <camomile-corpus-select id="corpus1" src-login="{{srcLogin}}"></camomile-corpus-select>
     <camomile-medium-select id="medium1" src-corpus="{{$.corpus1}}"></camomile-medium-select>
     <camomile-layer-select id="layer1" src-corpus="{{$.corpus1}}"></camomile-layer-select>
     <div style="clear: both;"></div>
@@ -52,6 +50,13 @@
   <script>
     class CamomileAnnotation extends Polymer.Element {
       static get is() { return 'camomile-annotation'; }
+
+
+      static get properties() {
+        return {
+          srcLogin: String
+        };
+      }
     }
 
     window.customElements.define(CamomileAnnotation.is, CamomileAnnotation);

@@ -1,22 +1,23 @@
 <link rel="import" href="bower_components/polymer/polymer-element.html">
+<link rel="import" href="bower_components/paper-button/paper-button.html">
+<link rel="import" href="bower_components/paper-input/paper-input.html">
 <script src="cookie.js"></script>
 
 <dom-module id="camomile-endpoint">
-
-
   <template>
-    <template is="dom-if" if="{{!endPointSet}}">
-      <form on-submit="setEndPoint">
-        <label>Endpoint: <input type="text" id="endpoint" /></label>
-        <input type="submit" value="Set endpoint"/>
-      </form>
-    </template>
-    <template is="dom-if" if="{{endPointSet}}">
-      {{url}}
-      <form on-submit="resetEndPoint">
-        <input type="submit" value="Reset endpoint"/>
-      </form>
-    </template>
+    <style>
+      :host {
+        display:block;
+      }
+    </style>
+      <template is="dom-if" if="{{!endPointSet}}">
+        <paper-input style="display:inline-block" label="Endpoint" type="text" id="endpoint" required></paper-input>
+        <paper-button raised class="indigo" on-click="setEndPoint">Set endpoint</paper-button>
+      </template>
+      <template is="dom-if" if="{{endPointSet}}">
+        {{url}}
+        <paper-button raised class="indigo" on-click="resetEndPoint">Reset endpoint</paper-button>
+      </template>
   </template>
 
   <script>
@@ -46,17 +47,14 @@
         }
       }
 
-      setEndPoint(e) {
-        e.preventDefault();
-
+      setEndPoint() {
         this.url=this.shadowRoot.querySelector("#endpoint").value;
         this.endPointSet=true;
         setCookie("endpoint",this.url,10);
         this.dispatchEvent(new CustomEvent('endpointSet', {}));
       }
 
-      resetEndPoint(e) {
-        e.preventDefault();
+      resetEndPoint() {
         this.url=null;
         this.endPointSet=false;
         setCookie("endpoint","",0);
