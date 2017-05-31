@@ -1,14 +1,22 @@
-<link rel="import" href="node_modules/@polymer/polymer/polymer-element.html">
+<link rel="import" href="bower_components/polymer/polymer-element.html">
+<link rel="import" href="src/shared-styles.html">
+<script src="getElementAt.js"></script>
 
 <dom-module id="camomile-corpus-create">
 
   <template>
-    <div>
-      Corpus creation :
-      <form on-submit="create">
-        <label>Name : <input type="text" id="name"/></label>
-        <label>License : <input type="text" id="license"/></label>
-        <input type="submit" value="Create"/>
+    <style include="shared-styles">
+      :host {
+        display: block;
+        padding: 10px;
+      }
+    </style>
+    <div class="card">
+      <h2>Corpus creation</h2>
+      <form>
+        <paper-input label="Name" type="text" id="name" required></paper-input>
+        <paper-input label="License" type="text" id="license" required></paper-input>
+        <paper-button raised class="indigo" on-click="create">Create</paper-button>
       </form>
       {{creation_status}}
     </div>
@@ -35,7 +43,7 @@
       ready() {
         super.ready();
 
-        const loginInstance = document.getElementById(this.srcLogin);
+        const loginInstance = getElementAt(this.srcLogin);
 
         if(loginInstance.logged_in)
           this._setupClient(loginInstance);

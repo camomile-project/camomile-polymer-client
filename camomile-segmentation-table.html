@@ -1,6 +1,7 @@
-<link rel="import" href="node_modules/@polymer/polymer/polymer-element.html">
-<link rel="import" href="node_modules/@polymer/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="bower_components/polymer/polymer-element.html">
+<link rel="import" href="bower_components/polymer/lib/elements/dom-repeat.html">
 
+<script src="getElementAt.js"></script>
 
 <dom-module id="camomile-segmentation-table">
 
@@ -26,17 +27,17 @@
       ready() {
         super.ready();
 
-        const layerState = document.getElementById(this.srcLayerState);
+        const layerState = getElementAt(this.srcLayerState);
 
 
         layerState.addEventListener("populate_annotations",({detail:{data}}) => {
           this.annotations=JSON.parse(JSON.stringify(data));
+          this.annotations.sort((a,b) => a.fragment.start - b.fragment.start);
         });
         layerState.addEventListener("reset_annotations",() => {
           this.annotations=null;
         });
 
-        // not sure how to use layerState.annotations without duplicating the changing code here (and using polymer data binding)
         layerState.addEventListener("add_annotation",({detail:{data}}) => {
           const annotationIndex=this.annotations.findIndex(annotation => annotation._id===data._id);
           if(annotationIndex!==-1)

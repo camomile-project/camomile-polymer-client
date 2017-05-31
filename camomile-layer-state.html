@@ -1,4 +1,5 @@
-<link rel="import" href="node_modules/@polymer/polymer/polymer-element.html">
+<link rel="import" href="bower_components/polymer/polymer-element.html">
+<script src="getElementAt.js"></script>
 
 
 <dom-module id="camomile-layer-state">
@@ -7,8 +8,6 @@
   </template>
 
   <script>
-
-    // not storing any data, just doing the server communication
 
     // update/delete/add event/methods + optional sync with server
     class CamomileLayerState extends Polymer.Element {
@@ -23,14 +22,14 @@
       ready() {
         super.ready();
 
-        const layerInstance = document.getElementById(this.srcLayer);
+        const layerInstance = getElementAt(this.srcLayer);
 
         if(layerInstance.layer)
           this._setupLayer(layerInstance);
         layerInstance.addEventListener("select", () => this._setupLayer(layerInstance));
         layerInstance.addEventListener("deselect", () => this._resetLayer());
 
-        const mediumInstance = document.getElementById(this.srcMedium);
+        const mediumInstance = getElementAt(this.srcMedium);
         if(mediumInstance.medium)
           this._setupMedium(mediumInstance);
         mediumInstance.addEventListener("select", () => this._setupMedium(mediumInstance));
@@ -60,14 +59,12 @@
         if(annotationIndex!==-1)
           return;
         this.push("annotations",data);
-        this.annotations.sort((a,b) => a.fragment.start - b.fragment.start);
         this.dispatchEvent(new CustomEvent("add_annotation",{detail:{data,sender}}));
       }
 
       _internalUpdate(data,sender) {
         const annotationIndex=this.annotations.findIndex(annotation => annotation._id===data._id);
         this.splice("annotations", annotationIndex, 1,data);
-        this.annotations.sort((a,b) => a.fragment.start - b.fragment.start);
         this.dispatchEvent(new CustomEvent("update_annotation",{detail:{data,sender}}));
       }
 
@@ -143,7 +140,6 @@
         this.client.getAnnotations({filter:{id_layer:layer,id_medium:medium}})
           .then(data => {
             console.log("annotations",data);
-            data = data.sort((a,b) => a.fragment.start - b.fragment.start);
             this.annotations=data;
             this.dispatchEvent(new CustomEvent("populate_annotations",{detail:{data}}));
           })

@@ -1,5 +1,6 @@
-<link rel="import" href="node_modules/@polymer/polymer/polymer-element.html">
-<link rel="import" href="node_modules/@polymer/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="bower_components/polymer/polymer-element.html">
+<link rel="import" href="bower_components/polymer/lib/elements/dom-repeat.html">
+<script src="getElementAt.js"></script>
 
 <script src="node_modules/vis/dist/vis.js"></script>
 
@@ -32,7 +33,7 @@
       ready() {
         super.ready();
 
-        this.layerState = document.getElementById(this.srcLayerState);
+        this.layerState = getElementAt(this.srcLayerState);
 
 
         this.layerState.addEventListener("populate_annotations",({detail:{data}}) => {
@@ -81,6 +82,7 @@
             this.$.edit.onsubmit=(e) => {
               e.preventDefault();
               item.content=this.$.label.value;
+              item.title=item.content;
               item.end=item.start+100;
               this.$.label.value="";
               this.$.edit.style="display:none";
@@ -102,6 +104,7 @@
             this.$.edit.onsubmit=(e) => {
               e.preventDefault();
               item.content=this.$.label.value;
+              item.title=item.content;
               this.$.label.value="";
               this.$.edit.style="display:none";
               this.$.edit.onsubmit=null;
@@ -113,7 +116,7 @@
         this.timeline = new vis.Timeline(container, this.items, options);
         this.timeline.addCustomTime(0,1);
 
-        const mediumView = document.getElementById(this.srcMediumView);
+        const mediumView = getElementAt(this.srcMediumView);
 
         this.editingTime=false;
         mediumView.addEventListener("timeupdate",({detail:{sender}}) => {
@@ -151,7 +154,8 @@
           id: _id,
           start,
           end,
-          content: data
+          content: data,
+          title:data
         }
       }
 

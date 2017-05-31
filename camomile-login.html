@@ -1,23 +1,26 @@
 <script src="node_modules/camomile-client/camomile.js"></script>
 
-<link rel="import" href="node_modules/@polymer/polymer/polymer-element.html">
-<link rel="import" href="node_modules/@polymer/polymer/lib/elements/dom-if.html">
+<link rel="import" href="bower_components/polymer/polymer-element.html">
+<link rel="import" href="bower_components/polymer/lib/elements/dom-if.html">
+<link rel="import" href="bower_components/paper-button/paper-button.html">
+<link rel="import" href="bower_components/paper-input/paper-input.html">
+<script src="getElementAt.js"></script>
 
 <dom-module id="camomile-login">
-
   <template>
+    <style is="custom-style">
+      :host {
+        display:block;
+      }
+    </style>
     <template is="dom-if" if="{{!logged_in}}">
-      <form on-submit="login">
-        <label>User: <input type="text" id="user" /></label>
-        <label>Password: <input type="password" id="password" /></label>
-        <input type="submit" value="Login"/>
-      </form>
+      <paper-input style="--paper-input-container-color: white; --paper-input-container-input-color: white; display:inline-block" label="User" type="text" id="user" required></paper-input>
+      <paper-input style="--paper-input-container-color: white; --paper-input-container-input-color: white; display:inline-block" label="Password" type="password" id="password" required></paper-input>
+      <paper-button raised class="indigo" on-click="login">Login</paper-button>
     </template>
     <template is="dom-if" if="{{logged_in}}">
       {{username}}
-      <form on-submit="logout">
-        <input type="submit" value="Logout"/>
-      </form>
+      <paper-button raised class="indigo" on-click="logout">Logout</paper-button>
     </template>
     {{login_status}}
   </template>
@@ -46,7 +49,7 @@
 
       ready() {
         super.ready();
-        const camomileInstance=document.getElementById(this.srcEndpoint);
+        const camomileInstance=getElementAt(this.srcEndpoint);
 
         if(camomileInstance.endPointSet)
           this._setupEndPoint(camomileInstance);
@@ -67,9 +70,7 @@
           });
       }
 
-      login(e) {
-        e.preventDefault();
-
+      login() {
         return this.client.login(this.shadowRoot.querySelector("#user").value, this.shadowRoot.querySelector("#password").value)
           .then(r => {
             console.log(r);
@@ -81,8 +82,7 @@
           });
       }
 
-      logout(e) {
-        if(e) e.preventDefault();
+      logout() {
         this.client.logout().then(() => {
           this.logged_in=false;
           console.log("logout");
