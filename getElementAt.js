@@ -1,3 +1,3 @@
 function getElementAt(src) {
-  return typeof src === "string" ? getElementAt(src) : src;
+  return typeof src === "string" ? document.getElementById(src) : src;
 }

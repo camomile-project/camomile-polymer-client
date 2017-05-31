@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Camomile client polymer</title>
+  <script src="bower_components/webcomponentsjs/webcomponents-loader.js"></script>
+  <link rel="import" href="camomile-endpoint.html">
+  <link rel="import" href="camomile-login.html">
+  <link rel="import" href="camomile-corpus-select.html">
+  <link rel="import" href="camomile-medium-select.html">
+  <link rel="import" href="camomile-player.html">
+  <link rel="import" href="camomile-corpus-create.html">
+  <link rel="import" href="camomile-medium-create.html">
+  <link rel="import" href="camomile-layer-select.html">
+  <link rel="import" href="camomile-layer-create.html">
+  <link rel="import" href="camomile-segmentation.html">
+  <link rel="import" href="camomile-segmentation-table.html">
+  <link rel="import" href="camomile-speaker-pie.html">
+  <link rel="import" href="camomile-wave-player.html">
+  <link rel="import" href="camomile-medium-view.html">
+  <link rel="import" href="camomile-layer-state.html">
+  <style>
+    body {
+      background-color:#eee;
+    }
+  </style>
+</head>
+
+<body>
+<camomile-endpoint id="camomile1"></camomile-endpoint>
+<div>
+  <camomile-login id="user1" src-endpoint="camomile1"></camomile-login>
+</div>
+<div>
+  <camomile-corpus-select id="corpus1" src-login="user1"></camomile-corpus-select>
+  <camomile-medium-select id="medium1" src-corpus="corpus1"></camomile-medium-select>
+  <camomile-corpus-create id="createCorpus1" src-login="user1"></camomile-corpus-create>
+  <br />
+  <camomile-medium-create id="createMedium1" src-corpus="corpus1"></camomile-medium-create>
+  <br />
+  <camomile-layer-create id="createLayer" src-corpus="corpus1"></camomile-layer-create>
+
+  <br />
+  <camomile-layer-select id="layer1" src-corpus="corpus1"></camomile-layer-select>
+  <camomile-player id="player1" src-medium-view="mediumView1"></camomile-player>
+  <camomile-wave-player id="wave-player1" src-medium-view="mediumView1"></camomile-wave-player>
+
+  <br />
+
+  <camomile-layer-state id="layerState1" src-layer="layer1" src-medium="medium1"></camomile-layer-state>
+  <camomile-medium-view id="mediumView1" src-medium="medium1"></camomile-medium-view>
+
+  <camomile-segmentation id="segmentation1" src-layer-state="layerState1" src-medium-view="mediumView1"></camomile-segmentation>
+  <camomile-speaker-pie id="pie1" src-layer-state="layerState1"></camomile-speaker-pie>
+  <camomile-segmentation-table id="segmentation2" src-layer-state="layerState1"></camomile-segmentation-table>
+
+
+</div>
+</body>
+</html>

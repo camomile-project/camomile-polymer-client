@@ -12,7 +12,9 @@ using `https://camomile.rom1504.fr` as the endpoint, `root` as user and `test` a
 The objective of this project is to define [web components](https://www.webcomponents.org/) using [polymer](https://www.polymer-project.org/)
 to make it easier to create camomile clients.
 
-An example of use of these components is in file [index.html](index.html)
+Examples :
+* index.html with my-app.html and camomile-admin.html and camomile-annotation.html
+* a one file example in simple-demo.html
 
 ## Implementation
 
@@ -24,7 +26,9 @@ So defining the needed components for camomile will consist in defining the rele
 ## Installation
 
 * npm install -g polymer-cli
+* npm install -g bower
 * npm install
+* bower install
 
 ## Run
 

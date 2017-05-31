@@ -11,7 +11,7 @@
       }
     </style>
       <template is="dom-if" if="{{!endPointSet}}">
-        <paper-input style="display:inline-block" label="Endpoint" type="text" id="endpoint" required></paper-input>
+        <paper-input style="--paper-input-container-color: white; --paper-input-container-input-color: white; display:inline-block" label="Endpoint" type="text" id="endpoint" required></paper-input>
         <paper-button raised class="indigo" on-click="setEndPoint">Set endpoint</paper-button>
       </template>
       <template is="dom-if" if="{{endPointSet}}">
