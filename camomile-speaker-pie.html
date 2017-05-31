@@ -1,5 +1,6 @@
-<link rel="import" href="node_modules/@polymer/polymer/polymer-element.html">
+<link rel="import" href="bower_components/polymer/polymer-element.html">
 <script src="node_modules/d3/build/d3.min.js"></script>
+<script src="getElementAt.js"></script>
 
 <dom-module id="camomile-speaker-pie">
 
@@ -62,7 +63,7 @@
         super.ready();
         this.createElements();
 
-        const layerState = document.getElementById(this.srcLayerState);
+        const layerState = getElementAt(this.srcLayerState);
 
         const refreshData= (data) => {
           this.m=data.reduce((acc,e) => {

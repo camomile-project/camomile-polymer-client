@@ -1,16 +1,27 @@
-<link rel="import" href="node_modules/@polymer/polymer/polymer-element.html">
+<link rel="import" href="bower_components/polymer/polymer-element.html">
+<link rel="import" href="bower_components/paper-input/paper-input.html">
+<link rel="import" href="bower_components/paper-button/paper-button.html">
+<link rel="import" href="src/shared-styles.html">
+<script src="getElementAt.js"></script>
 
 <dom-module id="camomile-layer-create">
 
   <template>
-    <div>
-      Layer creation :
-      <form on-submit="create">
-        <label>Name : <input type="text" id="name"/></label>
-        <label>Description : <input type="text" id="description"/></label>
-        <label>Fragment type : <input type="text" id="fragment_type"/></label>
-        <label>Data type : <input type="text" id="data_type"/></label>
-        <input type="submit" value="Create"/>
+
+    <style include="shared-styles">
+      :host {
+        display: block;
+        padding: 10px;
+      }
+    </style>
+    <div class="card">
+      <h2>Layer creation</h2>
+      <form>
+        <paper-input label="Name" type="text" id="name" required></paper-input>
+        <paper-input label="Description" type="text" id="description" required></paper-input>
+        <paper-input label="Fragment type" type="text" id="fragment_type" required></paper-input>
+        <paper-input label="Data type" type="text" id="data_type" required></paper-input>
+        <paper-button raised class="indigo" on-click="create">Create</paper-button>
       </form>
       {{creation_status}}
     </div>
@@ -39,7 +50,7 @@
       ready() {
         super.ready();
 
-        const corpusInstance = document.getElementById(this.srcCorpus);
+        const corpusInstance = getElementAt(this.srcCorpus);
 
         if(corpusInstance.corpus)
           this._setupCorpus(corpusInstance);
@@ -51,7 +62,13 @@
       create(e) {
         e.preventDefault();
         this.client.createLayer(this.corpus,this.$.name.value,this.$.description.value,this.$.fragment_type.value,this.$.data_type.value)
-          .then(() => this.creation_status="Creation succeeded.")
+          .then(() => {
+            this.creation_status="Creation succeeded.";
+            this.$.name.value="";
+            this.$.description.value="";
+            this.$.fragment_type.value="";
+            this.$.data_type.value="";
+          })
           .catch(e => {
             this.creation_status="Creation failed : "+e.message;
             console.log(e)
