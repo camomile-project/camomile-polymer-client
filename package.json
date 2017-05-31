@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "gh-publish": "git checkout gh-pages && git merge master && npm install && bower install && git add -f node_modules bower_components && git commit -m 'publish' ; git push origin gh-pages && git checkout master && npm install && bower install"
+    "gh-publish": "git checkout gh-pages && git merge master && git rm -rf node_modules bower_components && npm install && bower install && git add -f node_modules bower_components && git commit -m 'publish' ; git push origin gh-pages && git checkout master && npm install && bower install"
   },
   "repository": {
     "type": "git",
