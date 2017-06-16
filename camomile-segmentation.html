@@ -119,21 +119,21 @@
         const mediumView = getElementAt(this.srcMediumView);
 
         this.editingTime=false;
-        mediumView.addEventListener("timeupdate",({detail:{sender}}) => {
-          if(this.editingTime || sender===this.id)
+
+        mediumView.subscribe(this.id,"currentTime",() => {
+          if(this.editingTime)
             return;
+
           this.timeline.setCustomTime(mediumView.currentTime,1);
           this.timeline.moveTo(mediumView.currentTime);
         });
-
 
         this.timeline.on("timechange",() => {
           this.editingTime=true;
         });
 
         this.timeline.on("timechanged", () => {
-          mediumView.currentTime=this.timeline.getCustomTime(1);
-          mediumView.dispatchEvent(new CustomEvent("timeupdate",{detail:{sender:this.id}}));
+          mediumView.publish(this.id,"currentTime",this.timeline.getCustomTime(1));
           this.editingTime=false;
         });
 
@@ -142,8 +142,7 @@
         });
 
         this.timeline.on("rangechanged", (e) => {
-          mediumView.range={start:e.start,end:e.end};
-          mediumView.dispatchEvent(new CustomEvent("rangechanged",{detail:{sender:this.id}}));
+          mediumView.publish(this.id,"range",{start:e.start,end:e.end});
         })
 
       }

@@ -43,18 +43,15 @@
 
         mediumView.addEventListener("reset", () => this._resetMediumView());
 
+
         this.video.addEventListener("timeupdate",() => {
-          mediumView.currentTime=this.video.currentTime;
-          mediumView.dispatchEvent(new CustomEvent("timeupdate",{detail:{sender:this.id}}));
+          mediumView.publish(this.id,"currentTime",this.video.currentTime);
         });
 
 
-        mediumView.addEventListener("timeupdate",({detail:{sender}}) => {
-          if (sender === this.id)
-            return;
+        mediumView.subscribe(this.id,"currentTime",() => {
           this.video.currentTime=mediumView.currentTime;
         });
-
 
       }
 

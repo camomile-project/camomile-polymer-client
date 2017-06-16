@@ -64,22 +64,19 @@
         this.wavesurfer.on("seek",() => {
           if(this.beingSought)
             return;
-          mediumView.currentTime=this.wavesurfer.getCurrentTime();
-          mediumView.dispatchEvent(new CustomEvent("timeupdate",{detail:{sender:this.id}}));
+          mediumView.publish(this.id,"currentTime",this.wavesurfer.getCurrentTime());
         });
 
 
-        mediumView.addEventListener("timeupdate",({detail:{sender}}) => {
-          if (sender === this.id)
-            return;
+        mediumView.subscribe(this.id,"currentTime", () => {
           this.beingSought=true;
           this.wavesurfer.seekAndCenter(mediumView.currentTime/this.wavesurfer.getDuration());
           this.beingSought=false;
         });
 
 
-        mediumView.addEventListener("rangechanged",({detail:{sender}}) => {
-          if (sender === this.id || !this.loaded)
+        mediumView.subscribe(this.id,"range",() => {
+          if(!this.loaded)
             return;
 
           this.wavesurfer.zoom(this.$.waveform.clientWidth/(mediumView.range.end-mediumView.range.start));

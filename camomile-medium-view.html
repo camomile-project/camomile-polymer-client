@@ -23,6 +23,22 @@
         this.dispatchEvent(new CustomEvent('ready', {}));
       }
 
+      publish(id,ev,data) {
+        // publish
+        const self=this;
+        self[ev]=data;
+        this.dispatchEvent(new CustomEvent(ev,{detail:{sender:id,data:data}}));
+      }
+
+      subscribe(id,ev,cb) {
+        // subscribe
+        this.addEventListener(ev,({detail:{sender,data}}) => {
+          if(id===sender)
+            return;
+          cb(data);
+        })
+      }
+
       _resetMedium() {
         this.medium=null;
         this.medium_url="";
