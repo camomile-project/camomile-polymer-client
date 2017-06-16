@@ -88,7 +88,7 @@
               this.$.edit.style="display:none";
               this.$.edit.onsubmit=null;
               const {start,end,content}=item;
-              this.layerState.addAnnotation({start,end,data:content})
+              this.layerState.addAnnotation({start,end},content)
                 .then(result => {
                   item.id=result._id;
                   callback(item);
