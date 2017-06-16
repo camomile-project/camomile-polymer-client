@@ -41,9 +41,8 @@
       // currently going edit => server then server => event/edit (using wait)
       // because add without server isn't really possible currently
 
-      addAnnotation(d) {
-        const {start,end,data}=d;
-        return this.client.createAnnotation(this.layer,this.medium,{start,end},data);
+      addAnnotation(fragment,data) {
+        return this.client.createAnnotation(this.layer,this.medium,fragment,data);
       }
 
       updateAnnotation(id,data) {
