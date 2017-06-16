@@ -52,40 +52,75 @@
         });
 
 
-        const mediumView = getElementAt(this.srcMediumView);
+        let syncCurrentTime;
+        let syncRange;
+        let syncAll;
 
-        if(mediumView.medium) {
-          this._setupMediumView(mediumView)
+        if(this.syncAll) {
+          syncAll = getElementAt(this.syncAll);
+
+          if(syncAll.medium) {
+            this._setupMediumView(syncAll);
+          }
+
+          syncAll.addEventListener("ready", () => this._setupMediumView(syncAll));
+          syncAll.addEventListener("reset", () => this._resetMediumView());
+          syncCurrentTime=syncAll;
+          syncRange=syncAll;
         }
-        mediumView.addEventListener("ready", () => this._setupMediumView(mediumView));
-        mediumView.addEventListener("reset", () => this._resetMediumView());
 
-        this.beingSought=false;
-        this.wavesurfer.on("seek",() => {
-          if(this.beingSought)
-            return;
-          mediumView.publish(this.id,"currentTime",this.wavesurfer.getCurrentTime());
-        });
+        if(this.syncCurrentTime) {
+          syncCurrentTime = getElementAt(this.syncCurrentTime);
 
+          if(syncCurrentTime.medium) {
+            this._setupMediumView(syncCurrentTime)
+          }
+          syncCurrentTime.addEventListener("ready", () => this._setupMediumView(syncCurrentTime));
+          syncCurrentTime.addEventListener("reset", () => this._resetMediumView());
+        }
 
-        mediumView.subscribe(this.id,"currentTime", () => {
-          this.beingSought=true;
-          this.wavesurfer.seekAndCenter(mediumView.currentTime/this.wavesurfer.getDuration());
+        if(this.syncRange) {
+          syncRange = getElementAt(this.syncRange);
+
+          if(syncRange.medium) {
+            this._setupMediumView(syncRange)
+          }
+          syncRange.addEventListener("ready", () => this._setupMediumView(syncRange));
+          syncRange.addEventListener("reset", () => this._resetMediumView());
+        }
+
+        if(syncCurrentTime) {
           this.beingSought=false;
-        });
+          this.wavesurfer.on("seek",() => {
+            if(this.beingSought)
+              return;
+            syncCurrentTime.publish(this.id,"currentTime",this.wavesurfer.getCurrentTime());
+          });
 
 
-        mediumView.subscribe(this.id,"range",() => {
-          if(!this.loaded)
-            return;
+          syncCurrentTime.subscribe(this.id,"currentTime", () => {
+            this.beingSought=true;
+            this.wavesurfer.seekAndCenter(syncCurrentTime.currentTime/this.wavesurfer.getDuration());
+            this.beingSought=false;
+          });
+        }
 
-          this.wavesurfer.zoom(this.$.waveform.clientWidth/(mediumView.range.end-mediumView.range.start));
-        });
+
+        if(syncRange) {
+          syncRange.subscribe(this.id,"range",() => {
+            if(!this.loaded)
+              return;
+
+            this.wavesurfer.zoom(this.$.waveform.clientWidth/(syncRange.range.end-syncRange.range.start));
+          });
+        }
       }
 
       static get properties() {
         return {
-          srcMediumView: String,
+          syncCurrentTime: String,
+          syncRange: String,
+          syncAll: String,
           id: String
         }
       }

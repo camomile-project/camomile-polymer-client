@@ -116,35 +116,62 @@
         this.timeline = new vis.Timeline(container, this.items, options);
         this.timeline.addCustomTime(0,1);
 
-        const mediumView = getElementAt(this.srcMediumView);
 
-        this.editingTime=false;
+        let syncCurrentTime;
+        let syncRange;
+        let syncAll;
 
-        mediumView.subscribe(this.id,"currentTime",() => {
-          if(this.editingTime)
-            return;
+        if(this.syncAll) {
+          syncAll = getElementAt(this.syncAll);
 
-          this.timeline.setCustomTime(mediumView.currentTime,1);
-          this.timeline.moveTo(mediumView.currentTime);
-        });
+          syncCurrentTime=syncAll;
+          syncRange=syncAll;
+        }
 
-        this.timeline.on("timechange",() => {
-          this.editingTime=true;
-        });
+        if(this.syncCurrentTime) {
+          syncCurrentTime = getElementAt(this.syncCurrentTime);
 
-        this.timeline.on("timechanged", () => {
-          mediumView.publish(this.id,"currentTime",this.timeline.getCustomTime(1));
+        }
+
+        if(this.syncRange) {
+          syncRange = getElementAt(this.syncRange);
+        }
+
+
+        if(syncCurrentTime) {
           this.editingTime=false;
-        });
+
+          syncCurrentTime.subscribe(this.id,"currentTime",() => {
+            if(this.editingTime)
+              return;
+
+            this.timeline.setCustomTime(syncCurrentTime.currentTime,1);
+            this.timeline.moveTo(syncCurrentTime.currentTime);
+          });
+
+          this.timeline.on("timechange",() => {
+            this.editingTime=true;
+          });
+
+          this.timeline.on("timechanged", () => {
+            syncCurrentTime.publish(this.id,"currentTime",this.timeline.getCustomTime(1));
+            this.editingTime=false;
+          });
+        }
+
+
+
 
         this.timeline.on("click", (e) => {
           this.timeline.setSelection(e.item);
         });
 
-        this.timeline.on("rangechanged", (e) => {
-          mediumView.publish(this.id,"range",{start:e.start,end:e.end});
-        })
+        if(syncRange) {
+          this.timeline.on("rangechanged", (e) => {
+            syncRange.publish(this.id,"range",{start:e.start,end:e.end});
+          })
 
+        }
       }
 
       static _transformItem({_id,fragment:{start,end},data})
@@ -203,7 +230,9 @@
       static get properties() {
         return {
           srcLayerState: String,
-          srcMediumView: String,
+          syncCurrentTime: String,
+          syncRange: String,
+          syncAll: String,
           id: String
         };
       }

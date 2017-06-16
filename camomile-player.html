@@ -34,30 +34,48 @@
       ready() {
         super.ready();
 
-        const mediumView = getElementAt(this.srcMediumView);
-
-        if(mediumView.medium)
-          this._setupMediumView(mediumView);
-        mediumView.addEventListener("ready",() => this._setupMediumView(mediumView));
+        let syncCurrentTime;
+        let syncAll;
         this.video=this.$.video;
 
-        mediumView.addEventListener("reset", () => this._resetMediumView());
+        if(this.syncAll) {
+          syncAll = getElementAt(this.syncAll);
+
+          if(syncAll.medium) {
+            this._setupMediumView(syncAll);
+          }
+
+          syncAll.addEventListener("ready", () => this._setupMediumView(syncAll));
+          syncAll.addEventListener("reset", () => this._resetMediumView());
+          syncCurrentTime=syncAll;
+        }
+
+        if(this.syncCurrentTime) {
+          syncCurrentTime = getElementAt(this.syncCurrentTime);
+
+          if(syncCurrentTime.medium) {
+            this._setupMediumView(syncCurrentTime)
+          }
+          syncCurrentTime.addEventListener("ready", () => this._setupMediumView(syncCurrentTime));
+          syncCurrentTime.addEventListener("reset", () => this._resetMediumView());
+        }
+
+        if(syncCurrentTime) {
+          this.video.addEventListener("timeupdate",() => {
+            syncCurrentTime.publish(this.id,"currentTime",this.video.currentTime);
+          });
 
 
-        this.video.addEventListener("timeupdate",() => {
-          mediumView.publish(this.id,"currentTime",this.video.currentTime);
-        });
-
-
-        mediumView.subscribe(this.id,"currentTime",() => {
-          this.video.currentTime=mediumView.currentTime;
-        });
-
+          syncCurrentTime.subscribe(this.id,"currentTime",() => {
+            this.video.currentTime=syncCurrentTime.currentTime;
+          });
+        }
       }
 
       static get properties() {
         return {
-          srcMediumView: String,
+          syncCurrentTime: String,
+          syncAll: String,
           id: String
         }
       }

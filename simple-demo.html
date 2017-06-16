@@ -42,15 +42,15 @@
 
   <br />
   <camomile-layer-select id="layer1" src-corpus="corpus1"></camomile-layer-select>
-  <camomile-player id="player1" src-medium-view="mediumView1"></camomile-player>
-  <camomile-wave-player id="wave-player1" src-medium-view="mediumView1"></camomile-wave-player>
+  <camomile-player id="player1" sync-all="mediumView1"></camomile-player>
+  <camomile-wave-player id="wave-player1" sync-all="mediumView1"></camomile-wave-player>
 
   <br />
 
   <camomile-layer-state id="layerState1" src-layer="layer1" src-medium="medium1"></camomile-layer-state>
   <camomile-medium-view id="mediumView1" src-medium="medium1"></camomile-medium-view>
 
-  <camomile-segmentation id="segmentation1" src-layer-state="layerState1" src-medium-view="mediumView1"></camomile-segmentation>
+  <camomile-segmentation id="segmentation1" src-layer-state="layerState1" sync-all="mediumView1"></camomile-segmentation>
   <camomile-speaker-pie id="pie1" src-layer-state="layerState1"></camomile-speaker-pie>
   <camomile-segmentation-table id="segmentation2" src-layer-state="layerState1"></camomile-segmentation-table>
 
