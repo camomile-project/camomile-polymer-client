@@ -55,6 +55,7 @@
         let syncCurrentTime;
         let syncRange;
         let syncAll;
+        let syncPlaying;
 
         if(this.syncAll) {
           syncAll = getElementAt(this.syncAll);
@@ -67,6 +68,7 @@
           syncAll.addEventListener("reset", () => this._resetMediumView());
           syncCurrentTime=syncAll;
           syncRange=syncAll;
+          syncPlaying=syncAll;
         }
 
         if(this.syncCurrentTime) {
@@ -87,6 +89,16 @@
           }
           syncRange.addEventListener("ready", () => this._setupMediumView(syncRange));
           syncRange.addEventListener("reset", () => this._resetMediumView());
+        }
+
+        if(this.syncPlaying) {
+          syncPlaying = getElementAt(this.syncPlaying);
+
+          if(syncPlaying.medium) {
+            this._setupMediumView(syncPlaying)
+          }
+          syncPlaying.addEventListener("ready", () => this._setupMediumView(syncPlaying));
+          syncPlaying.addEventListener("reset", () => this._resetMediumView());
         }
 
         if(syncCurrentTime) {
@@ -114,6 +126,18 @@
             this.wavesurfer.zoom(this.$.waveform.clientWidth/(syncRange.range.end-syncRange.range.start));
           });
         }
+
+        if(syncPlaying) {
+          syncPlaying.subscribe(this.id,"playing",(playing) => {
+            if(!this.loaded)
+              return;
+
+            if(playing)
+              this.wavesurfer.play();
+            else
+              this.wavesurfer.pause();
+          });
+        }
       }
 
       static get properties() {
@@ -121,6 +145,7 @@
           syncCurrentTime: String,
           syncRange: String,
           syncAll: String,
+          syncPlaying: String,
           id: String
         }
       }

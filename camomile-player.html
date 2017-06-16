@@ -36,6 +36,7 @@
 
         let syncCurrentTime;
         let syncAll;
+        let syncPlaying;
         this.video=this.$.video;
 
         if(this.syncAll) {
@@ -48,6 +49,7 @@
           syncAll.addEventListener("ready", () => this._setupMediumView(syncAll));
           syncAll.addEventListener("reset", () => this._resetMediumView());
           syncCurrentTime=syncAll;
+          syncPlaying=syncAll;
         }
 
         if(this.syncCurrentTime) {
@@ -60,14 +62,33 @@
           syncCurrentTime.addEventListener("reset", () => this._resetMediumView());
         }
 
+        if(this.syncPlaying) {
+          syncPlaying = getElementAt(this.syncPlaying);
+
+          if(syncPlaying.medium) {
+            this._setupMediumView(syncPlaying)
+          }
+          syncPlaying.addEventListener("ready", () => this._setupMediumView(syncPlaying));
+          syncPlaying.addEventListener("reset", () => this._resetMediumView());
+        }
+
         if(syncCurrentTime) {
           this.video.addEventListener("timeupdate",() => {
             syncCurrentTime.publish(this.id,"currentTime",this.video.currentTime);
           });
 
-
           syncCurrentTime.subscribe(this.id,"currentTime",() => {
             this.video.currentTime=syncCurrentTime.currentTime;
+          });
+        }
+
+
+        if(syncPlaying) {
+          this.video.addEventListener("play", () => {
+            syncPlaying.publish(this.id,"playing",true);
+          });
+          this.video.addEventListener("pause", () => {
+            syncPlaying.publish(this.id,"playing",false);
           });
         }
       }
@@ -75,6 +96,7 @@
       static get properties() {
         return {
           syncCurrentTime: String,
+          syncPlaying: String,
           syncAll: String,
           id: String
         }
