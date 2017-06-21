@@ -5,7 +5,7 @@
 
   <template>
     <video id="video" width="640" height="480" controls>
-      <source src="{{medium_url}}" type="video/webm">
+      <source src="{{medium_url}}" type="video/{{format}}">
     </video>
   </template>
 
@@ -22,12 +22,14 @@
       _setupMediumView(mediumView) {
         console.log("setting player",this.id,"to",mediumView.medium_url);
         this.medium_url = mediumView.medium_url;
+        this.format = mediumView.format;
         this.$.video.load();
       }
 
       _resetMediumView() {
         console.log("reset player",this.id);
         this.medium_url="";
+        this.format="";
         this.$.video.load();
       }
 
