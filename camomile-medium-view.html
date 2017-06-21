@@ -19,7 +19,7 @@
       _setupMedium(mediumInstance) {
         this.medium=mediumInstance.medium;
         this.client=mediumInstance.client;
-        this.medium_url = this.client.getMediumURL(mediumInstance.medium, 'webm');
+        this.medium_url = this.client.getMediumURL(mediumInstance.medium, this.format);
         this.dispatchEvent(new CustomEvent('ready', {}));
       }
 
@@ -60,6 +60,7 @@
       static get properties() {
         return {
           srcMedium: String,
+          format: String,
           id: String
         };
       }
