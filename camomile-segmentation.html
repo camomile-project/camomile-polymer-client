@@ -140,23 +140,28 @@
 
         if(syncCurrentTime) {
           this.editingTime=false;
+          const setup=() => {
+            syncCurrentTime.subscribe(this.id,"currentTime",() => {
+              if(this.editingTime)
+                return;
 
-          syncCurrentTime.subscribe(this.id,"currentTime",() => {
-            if(this.editingTime)
-              return;
+              this.timeline.setCustomTime(syncCurrentTime.currentTime,1);
+              this.timeline.moveTo(syncCurrentTime.currentTime);
+            });
 
-            this.timeline.setCustomTime(syncCurrentTime.currentTime,1);
-            this.timeline.moveTo(syncCurrentTime.currentTime);
-          });
+            this.timeline.on("timechange",() => {
+              this.editingTime=true;
+            });
 
-          this.timeline.on("timechange",() => {
-            this.editingTime=true;
-          });
+            this.timeline.on("timechanged", () => {
+              syncCurrentTime.publish(this.id,"currentTime",this.timeline.getCustomTime(1));
+              this.editingTime=false;
+            });
+          };
 
-          this.timeline.on("timechanged", () => {
-            syncCurrentTime.publish(this.id,"currentTime",this.timeline.getCustomTime(1));
-            this.editingTime=false;
-          });
+          if(syncCurrentTime.medium)
+            setup();
+          syncCurrentTime.addEventListener("ready", () => setup());
         }
 
 

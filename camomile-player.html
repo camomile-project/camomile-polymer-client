@@ -75,24 +75,38 @@
         }
 
         if(syncCurrentTime) {
-          this.video.addEventListener("timeupdate",() => {
-            syncCurrentTime.publish(this.id,"currentTime",this.video.currentTime);
-          });
+          const setup=() => {
+            this.video.addEventListener("timeupdate",() => {
+              syncCurrentTime.publish(this.id,"currentTime",this.video.currentTime);
+            });
 
-          syncCurrentTime.subscribe(this.id,"currentTime",() => {
-            this.video.currentTime=syncCurrentTime.currentTime;
-          });
+            syncCurrentTime.subscribe(this.id,"currentTime",() => {
+              this.video.currentTime=syncCurrentTime.currentTime;
+            });
+          };
+
+          if(syncCurrentTime.medium) {
+            setup();
+          }
+          syncCurrentTime.addEventListener("ready", () => setup());
         }
 
 
         if(syncPlaying) {
-          this.video.addEventListener("play", () => {
-            syncPlaying.publish(this.id,"playing",true);
-          });
-          this.video.addEventListener("pause", () => {
-            syncPlaying.publish(this.id,"playing",false);
-          });
+          const setup = () => {
+            this.video.addEventListener("play", () => {
+              syncPlaying.publish(this.id, "playing", true);
+            });
+            this.video.addEventListener("pause", () => {
+              syncPlaying.publish(this.id, "playing", false);
+            });
+          };
+          if(syncPlaying.medium) {
+            setup();
+          }
+          syncPlaying.addEventListener("ready", () => setup());
         }
+
       }
 
       static get properties() {

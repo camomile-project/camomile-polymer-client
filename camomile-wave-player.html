@@ -102,41 +102,63 @@
         }
 
         if(syncCurrentTime) {
-          this.beingSought=false;
-          this.wavesurfer.on("seek",() => {
-            if(this.beingSought)
-              return;
-            syncCurrentTime.publish(this.id,"currentTime",this.wavesurfer.getCurrentTime());
-          });
-
-
-          syncCurrentTime.subscribe(this.id,"currentTime", () => {
-            this.beingSought=true;
-            this.wavesurfer.seekAndCenter(syncCurrentTime.currentTime/this.wavesurfer.getDuration());
+          const setup=() => {
             this.beingSought=false;
-          });
+            this.wavesurfer.on("seek",() => {
+              if(this.beingSought)
+                return;
+              syncCurrentTime.publish(this.id,"currentTime",this.wavesurfer.getCurrentTime());
+            });
+
+
+            syncCurrentTime.subscribe(this.id,"currentTime", () => {
+              this.beingSought=true;
+              this.wavesurfer.seekAndCenter(syncCurrentTime.currentTime/this.wavesurfer.getDuration());
+              this.beingSought=false;
+            });
+          };
+          if(syncCurrentTime.medium)
+            setup();
+
+          syncCurrentTime.addEventListener("ready", () => setup());
+
         }
 
 
         if(syncRange) {
-          syncRange.subscribe(this.id,"range",() => {
-            if(!this.loaded)
-              return;
+          const setup= () => {
+            syncRange.subscribe(this.id,"range",() => {
+              if(!this.loaded)
+                return;
 
-            this.wavesurfer.zoom(this.$.waveform.clientWidth/(syncRange.range.end-syncRange.range.start));
-          });
+              this.wavesurfer.zoom(this.$.waveform.clientWidth/(syncRange.range.end-syncRange.range.start));
+            });
+          };
+
+          if(syncRange.medium)
+            setup();
+
+          syncRange.addEventListener("ready", () => setup());
         }
 
         if(syncPlaying) {
-          syncPlaying.subscribe(this.id,"playing",(playing) => {
-            if(!this.loaded)
-              return;
+          const setup = () => {
+            syncPlaying.subscribe(this.id,"playing",(playing) => {
+              if(!this.loaded)
+                return;
 
-            if(playing)
-              this.wavesurfer.play();
-            else
-              this.wavesurfer.pause();
-          });
+              if(playing)
+                this.wavesurfer.play();
+              else
+                this.wavesurfer.pause();
+            });
+          };
+
+
+          if(syncPlaying.medium)
+            setup();
+
+          syncPlaying.addEventListener("ready", () => setup());
         }
       }
 
