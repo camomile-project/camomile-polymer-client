@@ -1,5 +1,16 @@
 # camomile-polymer-client
 
+This [project](https://digicosme.lri.fr/tiki-index.php?page=Mission+Doctorale+Romain+BEAUMONT) was partially supported by 
+
+<img src="LogoDigiSaclayHD.png" alt="Supported by Digicosme" width="200">
+
+The objective is to define [web components](https://www.webcomponents.org/) using [polymer](https://www.polymer-project.org/)
+to make it easier to create camomile clients.
+
+Examples :
+* index.html with my-app.html and camomile-admin.html and camomile-annotation.html
+* a one file example in simple-demo.html
+
 ## Demo
 
 You can try it on the github pages demo at [https://camomile-project.github.io/camomile-polymer-client/](https://camomile-project.github.io/camomile-polymer-client/)
@@ -8,13 +19,6 @@ using `https://camomile.rom1504.fr` as the endpoint, `root` as user and `test` a
 ## Specifications
 
 ![specifications](specifications.jpg)
-
-The objective of this project is to define [web components](https://www.webcomponents.org/) using [polymer](https://www.polymer-project.org/)
-to make it easier to create camomile clients.
-
-Examples :
-* index.html with my-app.html and camomile-admin.html and camomile-annotation.html
-* a one file example in simple-demo.html
 
 ## Implementation
 
